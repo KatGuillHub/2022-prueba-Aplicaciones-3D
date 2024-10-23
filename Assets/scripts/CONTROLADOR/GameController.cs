@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement; // Para reiniciar y cerrar el juego
 using TMPro; // Para los textos del UI
@@ -8,10 +7,21 @@ public class GameController : MonoBehaviour
 {
     public GameObject gameOverUI; // Referencia al UI de Fin de Juego
     public GameObject pauseUI; // Referencia al UI de Pausa
+    public GameObject tutorialPanel; // Referencia al panel del tutorial
     public GameHUDView gameHUDView; // Referencia al HUD para acceder a las monedas y distancia
     public PlayerController playerController; // Referencia al PlayerController
+    public CanvasGroup tutorialCanvasGroup; // Referencia al CanvasGroup para el fade in/out del tutorial
+
+    public float tutorialDuration = 3f; // Duración del tutorial en segundos
+    public float fadeDuration = 1f; // Duración del fade in/out en segundos
 
     private bool isPaused = false;
+
+    void Start()
+    {
+        // Mostrar el tutorial al iniciar el juego
+        StartCoroutine(ShowTutorial());
+    }
 
     void Update()
     {
@@ -52,7 +62,7 @@ public class GameController : MonoBehaviour
     {
         Debug.Log("Se envió al menú principal.");
         // Aquí podrías cargar la escena del menú principal usando:
-        SceneManager.LoadScene("Pantalla_Principal");
+        // SceneManager.LoadScene("MainMenu");
     }
 
     // Método para cerrar el juego
@@ -76,5 +86,37 @@ public class GameController : MonoBehaviour
         isPaused = false;
         Time.timeScale = 1f; // Restaurar el tiempo
         pauseUI.SetActive(false); // Ocultar la UI de pausa
+    }
+
+    // Mostrar el tutorial al iniciar el juego con un fade in
+    IEnumerator ShowTutorial()
+    {
+        tutorialPanel.SetActive(true); // Asegurarse de que el panel esté activo
+
+        // Aplicar fade in
+        yield return StartCoroutine(FadeCanvasGroup(tutorialCanvasGroup, 0, 1, fadeDuration));
+
+        // Esperar 3 segundos antes de hacer el fade out
+        yield return new WaitForSeconds(tutorialDuration);
+
+        // Aplicar fade out
+        yield return StartCoroutine(FadeCanvasGroup(tutorialCanvasGroup, 1, 0, fadeDuration));
+
+        tutorialPanel.SetActive(false); // Ocultar el panel después del fade out
+    }
+
+    // Método para realizar un fade en el CanvasGroup
+    IEnumerator FadeCanvasGroup(CanvasGroup canvasGroup, float startAlpha, float endAlpha, float duration)
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            canvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        canvasGroup.alpha = endAlpha; // Asegurar que se alcanza el alpha final
     }
 }

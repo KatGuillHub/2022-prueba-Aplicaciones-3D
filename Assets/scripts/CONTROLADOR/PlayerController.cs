@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; // Para manejar la barra de energía
 
 public class PlayerController : MonoBehaviour
 {
@@ -18,6 +19,13 @@ public class PlayerController : MonoBehaviour
 
     public float collisionThresholdZ = 1.5f; // Umbral de distancia para detectar colisión frontal en el eje Z
     public float collisionThresholdX = 0.5f; // Umbral de distancia para detectar colisión frontal en el eje X
+
+    // Variables para el freno y la barra de energía
+    public float energy = 100f; // Cantidad inicial de energía
+    public float maxEnergy = 100f; // Energía máxima
+    public float energyConsumptionRate = 20f; // Energía consumida por segundo al frenar
+    public float energyRechargeRate = 10f; // Energía recargada por segundo
+    public Image energyBar; // Referencia a la barra de energía en la UI
 
     void Start()
     {
@@ -44,14 +52,10 @@ public class PlayerController : MonoBehaviour
         // Mover al ciclista de manera rápida a la nueva posición
         transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * laneSwitchSpeed);
 
-        // Frenar (ralentizar el entorno)
-        if (Input.GetKey(KeyCode.Space))
+        // Manejar el freno solo si queda energía
+        if (Input.GetKey(KeyCode.Space) && energy > 0)
         {
-            if (!isSlowingDown)
-            {
-                Time.timeScale = 0.5f; // Ralentizar el tiempo
-                isSlowingDown = true;
-            }
+            ApplyBrake();
         }
         else
         {
@@ -61,12 +65,58 @@ public class PlayerController : MonoBehaviour
                 isSlowingDown = false;
             }
         }
+
+        // Recargar energía cuando no se está frenando
+        if (!Input.GetKey(KeyCode.Space))
+        {
+            RechargeEnergy();
+        }
+
+        // Actualizar la barra de energía en la UI
+        UpdateEnergyBar();
     }
 
     void SetTargetPosition()
     {
         // Cambiar la posición objetivo para el siguiente carril
         targetPosition = new Vector3((currentLane - 1) * laneDistance, transform.position.y, transform.position.z);
+    }
+
+    void ApplyBrake()
+    {
+        if (!isSlowingDown)
+        {
+            Time.timeScale = 0.5f; // Ralentizar el tiempo
+            isSlowingDown = true;
+        }
+
+        // Consumir energía mientras se usa el freno
+        energy -= energyConsumptionRate * Time.deltaTime;
+        if (energy < 0)
+        {
+            energy = 0; // Asegurarse de que la energía no sea negativa
+            Time.timeScale = 1f; // Restablecer velocidad si la energía se agota
+            isSlowingDown = false;
+        }
+    }
+
+    void RechargeEnergy()
+    {
+        // Recargar la energía hasta el máximo
+        energy += energyRechargeRate * Time.deltaTime;
+        if (energy > maxEnergy)
+        {
+            energy = maxEnergy;
+        }
+    }
+
+    void UpdateEnergyBar()
+    {
+        // Actualizar la barra de energía en la UI
+        if (energyBar != null)
+        {
+            energyBar.fillAmount = energy / maxEnergy;
+        }
     }
 
     // Método para comenzar a temblar
@@ -79,7 +129,6 @@ public class PlayerController : MonoBehaviour
         shakeCoroutine = StartCoroutine(Shake(shakeDuration)); // Iniciar el temblor
     }
 
-    // Corrutina para gestionar el temblor del jugador
     private IEnumerator Shake(float shakeDuration)
     {
         isShaking = true;
@@ -91,20 +140,17 @@ public class PlayerController : MonoBehaviour
         Debug.Log("El jugador deja de temblar");
     }
 
-    // Método para volver al carril anterior después de una colisión lateral
     public void ResetToLane()
     {
         currentLane = previousLane; // Vuelve al carril anterior
         SetTargetPosition(); // Ajustar la posición del jugador
     }
 
-    // Método que se llama cuando el jugador pierde
     public void LoseGame()
     {
         FindObjectOfType<GameController>().OnPlayerDeath(); // Llamar al GameController cuando el jugador muera
     }
 
-    // Este método se llama continuamente mientras el jugador está en contacto con el collider de un objeto
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Obstacle"))
@@ -113,58 +159,49 @@ public class PlayerController : MonoBehaviour
         }
         else if (other.CompareTag("Coin"))
         {
-            // Si colisiona con una moneda, recolectarla
             CollectCoin(other.gameObject);
         }
     }
 
-    // Manejo de colisión con obstáculo
     void HandleObstacleCollision(Collider obstacle)
     {
         Vector3 obstaclePosition = obstacle.transform.position;
         Vector3 playerPosition = transform.position;
 
-        // Detectar colisión frontal: si el obstáculo está por delante del jugador en Z y en el mismo carril (X)
         bool isFrontalCollision = Mathf.Abs(obstaclePosition.x - playerPosition.x) < collisionThresholdX &&
                                   Mathf.Abs(playerPosition.z - obstaclePosition.z) < collisionThresholdZ;
 
         if (isFrontalCollision)
         {
-            // Colisión frontal: pérdida inmediata
             Debug.Log("Colisión frontal detectada");
             LoseGame(); // Pierde si se choca de frente en cualquier carril
         }
         else
         {
-            // Colisión lateral: no es derrota instantánea
             HandleLateralCollision();
         }
     }
 
-    // Manejo de colisión lateral (no derrota inmediata)
     void HandleLateralCollision()
     {
         if (isShaking && !canBeHitAgain)
         {
-            // Si está temblando y vuelve a chocar, pierde el juego
             Debug.Log("Colisión lateral durante el temblor, el jugador pierde.");
             LoseGame();
         }
         else
         {
-            // Primer choque lateral: el jugador tiembla y regresa al carril anterior
             Debug.Log("Colisión lateral detectada, el jugador comienza a temblar.");
-            StartShaking(shakeTime); // Si es un choque lateral, el jugador tiembla
-            ResetToLane(); // Regresar al carril anterior
+            StartShaking(shakeTime);
+            ResetToLane();
         }
     }
 
-    // Manejo de la recolección de monedas
     void CollectCoin(GameObject coin)
     {
-        coin.SetActive(false); // Desactivar la moneda
+        coin.SetActive(false);
         ObjectsController objectsController = FindObjectOfType<ObjectsController>();
-        objectsController.AddCoin(); // Llama al método AddCoin en ObjectsController para sumar las monedas
-        StartCoroutine(objectsController.RespawnCoin(coin)); // Reaparecer la moneda después de 3 segundos
+        objectsController.AddCoin();
+        StartCoroutine(objectsController.RespawnCoin(coin));
     }
 }
