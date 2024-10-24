@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour
     public float fadeDuration = 1f; // Duración del fade in/out en segundos
 
     private bool isPaused = false;
+    private bool isGameOver = false; // Añadir un estado de Game Over para controlar las interacciones
 
     void Start()
     {
@@ -28,11 +29,11 @@ public class GameController : MonoBehaviour
         // Detectar si el jugador ha presionado la tecla "escape" para pausar o despausar
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (!isPaused)
+            if (!isPaused && !isGameOver) // Solo pausar si no está en Game Over
             {
                 PauseGame();
             }
-            else
+            else if (isPaused)
             {
                 ResumeGame();
             }
@@ -40,14 +41,24 @@ public class GameController : MonoBehaviour
     }
 
     // Llamar este método cuando el jugador pierda
-    public void OnPlayerDeath()
+    public void OnPlayerDeath(int coinsCollectedThisGame)
     {
+        isGameOver = true; // Marcar que el juego ha terminado
         Time.timeScale = 0f; // Detener el tiempo del juego
         gameOverUI.SetActive(true); // Mostrar la pantalla de Fin de Juego
 
         // Actualizar la UI con la distancia recorrida y monedas obtenidas
         gameOverUI.transform.Find("DistanceText").GetComponent<TextMeshProUGUI>().text = "Distancia: " + Mathf.Floor(gameHUDView.GetDistanceTravelled()) + "m";
-        gameOverUI.transform.Find("CoinsText").GetComponent<TextMeshProUGUI>().text = "Monedas: " + gameHUDView.GetCoinsCollected();
+        gameOverUI.transform.Find("CoinsText").GetComponent<TextMeshProUGUI>().text = "Monedas: " + coinsCollectedThisGame.ToString();
+
+        // Desactivar el HUD del juego
+        gameHUDView.gameObject.SetActive(false);
+
+        // Desactivar el Tutorial del juego
+        tutorialCanvasGroup.gameObject.SetActive(false);
+
+        // Bloquear la interacción del espacio en PlayerController
+        playerController.DisableSpaceInteraction();
     }
 
     // Método para reiniciar la partida
@@ -78,6 +89,9 @@ public class GameController : MonoBehaviour
         isPaused = true;
         Time.timeScale = 0f; // Detener el tiempo
         pauseUI.SetActive(true); // Mostrar la UI de pausa
+
+        // Bloquear la interacción del espacio mientras el juego está en pausa
+        playerController.DisableSpaceInteraction();
     }
 
     // Reanudar el juego
@@ -86,6 +100,9 @@ public class GameController : MonoBehaviour
         isPaused = false;
         Time.timeScale = 1f; // Restaurar el tiempo
         pauseUI.SetActive(false); // Ocultar la UI de pausa
+
+        // Permitir la interacción con el espacio nuevamente al reanudar
+        playerController.EnableSpaceInteraction();
     }
 
     // Mostrar el tutorial al iniciar el juego con un fade in

@@ -6,6 +6,7 @@ using UnityEngine;
 public class EnvironmentController : MonoBehaviour
 {
     public List<GameObject> bloques; // Lista de bloques (Bloque1, Bloque2, ..., Bloque10)
+    public ObjectsController objectsController; // Referencia al ObjectsController que manejará los obstáculos
     public float startSpeed = 10f; // Velocidad inicial del entorno
     public float maxSpeed = 40f; // Velocidad máxima
     public float accelerationRate = 0.1f; // Aceleración por segundo
@@ -37,21 +38,25 @@ public class EnvironmentController : MonoBehaviour
         // Crear la lista de bloques disponibles al inicio (sin duplicar los activos)
         availableBlocks = new List<GameObject>(bloques);
 
-        // Inicializar el primer bloque como Bloque1
+        // Inicializar el primer bloque como Bloque1 y colocarlo en la posición (0, 0, 0)
         GameObject firstBlock = bloques[0]; // Bloque1
         firstBlock.transform.position = new Vector3(0, 0, 0); // Posición inicial en (0, 0, 0)
         activeBlocks.Enqueue(firstBlock);
         firstBlock.SetActive(true);
         availableBlocks.Remove(firstBlock); // Remover Bloque1 de los disponibles
 
-        // Inicializar los otros 2 bloques visibles siguiendo las reglas de conexión
+        // Generar los otros 2 bloques siguiendo las reglas de conexión
         for (int i = 1; i < 3; i++)
         {
-            GameObject newBlock = GetNextBlock(i == 1 ? 1 : GetBlockIDFromName(activeBlocks.Peek().name)); // El primer bloque siempre es Bloque1
-            newBlock.transform.position = new Vector3(0, 0, i * blockDistance); // Coloca los bloques en secuencia
+            GameObject newBlock = GetNextBlock(GetBlockIDFromName(activeBlocks.Last().name));
+            newBlock.transform.position = new Vector3(0, 0, activeBlocks.Last().transform.position.z + blockDistance); // Coloca los bloques en secuencia
             activeBlocks.Enqueue(newBlock);
             newBlock.SetActive(true);
-            availableBlocks.Remove(newBlock); // Remover el bloque visible de los disponibles
+            availableBlocks.Remove(newBlock);
+
+            // Llamar a los obstáculos correspondientes para este bloque
+            int blockID = GetBlockIDFromName(newBlock.name);
+            objectsController.SpawnObstaclesForBlock(blockID, newBlock.transform.position.z); // Llamar al obstáculo
         }
     }
 
@@ -83,7 +88,11 @@ public class EnvironmentController : MonoBehaviour
             newBlock.transform.position = new Vector3(0, 0, activeBlocks.Last().transform.position.z + blockDistance); // Posicionar el bloque al final
             newBlock.SetActive(true);
             activeBlocks.Enqueue(newBlock);
-            availableBlocks.Remove(newBlock); // Remover el bloque visible de los disponibles
+            availableBlocks.Remove(newBlock);
+
+            // Llamar a los obstáculos correspondientes para este bloque
+            int blockID = GetBlockIDFromName(newBlock.name);
+            objectsController.SpawnObstaclesForBlock(blockID, newBlock.transform.position.z); // Llamar al obstáculo
         }
     }
 

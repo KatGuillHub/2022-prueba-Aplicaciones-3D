@@ -20,12 +20,17 @@ public class PlayerController : MonoBehaviour
     public float collisionThresholdZ = 1.5f; // Umbral de distancia para detectar colisión frontal en el eje Z
     public float collisionThresholdX = 0.5f; // Umbral de distancia para detectar colisión frontal en el eje X
 
+    // Variables de monedas
+    private int coinsCollectedThisGame = 0; // Monedas recogidas en esta partida
+
     // Variables para el freno y la barra de energía
     public float energy = 100f; // Cantidad inicial de energía
     public float maxEnergy = 100f; // Energía máxima
     public float energyConsumptionRate = 20f; // Energía consumida por segundo al frenar
     public float energyRechargeRate = 10f; // Energía recargada por segundo
     public Image energyBar; // Referencia a la barra de energía en la UI
+
+    private bool canUseSpace = true; // Controla si se puede usar la tecla "espacio"
 
     void Start()
     {
@@ -52,8 +57,8 @@ public class PlayerController : MonoBehaviour
         // Mover al ciclista de manera rápida a la nueva posición
         transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * laneSwitchSpeed);
 
-        // Manejar el freno solo si queda energía
-        if (Input.GetKey(KeyCode.Space) && energy > 0)
+        // Solo permitir el uso del freno si no está bloqueado
+        if (canUseSpace && Input.GetKey(KeyCode.Space) && energy > 0)
         {
             ApplyBrake();
         }
@@ -66,13 +71,11 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // Recargar energía cuando no se está frenando
         if (!Input.GetKey(KeyCode.Space))
         {
             RechargeEnergy();
         }
 
-        // Actualizar la barra de energía en la UI
         UpdateEnergyBar();
     }
 
@@ -119,6 +122,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Método para desactivar la interacción con la tecla "espacio"
+    public void DisableSpaceInteraction()
+    {
+        canUseSpace = false;
+    }
+
+    // Método para activar la interacción con la tecla "espacio"
+    public void EnableSpaceInteraction()
+    {
+        canUseSpace = true;
+    }
+
     // Método para comenzar a temblar
     public void StartShaking(float shakeDuration)
     {
@@ -148,7 +163,8 @@ public class PlayerController : MonoBehaviour
 
     public void LoseGame()
     {
-        FindObjectOfType<GameController>().OnPlayerDeath(); // Llamar al GameController cuando el jugador muera
+        // Llamar al GameController y pasar el número de monedas recogidas en esta partida
+        FindObjectOfType<GameController>().OnPlayerDeath(coinsCollectedThisGame);
     }
 
     private void OnTriggerStay(Collider other)
@@ -197,11 +213,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Método que maneja la recolección de monedas
     void CollectCoin(GameObject coin)
     {
         coin.SetActive(false);
         ObjectsController objectsController = FindObjectOfType<ObjectsController>();
         objectsController.AddCoin();
         StartCoroutine(objectsController.RespawnCoin(coin));
+
+        // Incrementar el contador de monedas recogidas en la partida actual
+        coinsCollectedThisGame++;
+
+        // Guardar monedas en PlayerPrefs (monedas totales)
+        int currentCoins = PlayerPrefs.GetInt("TotalCoins", 0);
+        currentCoins++;
+        PlayerPrefs.SetInt("TotalCoins", currentCoins);
+        PlayerPrefs.Save();
     }
 }

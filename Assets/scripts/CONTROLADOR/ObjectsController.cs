@@ -21,18 +21,19 @@ public class ObjectsController : MonoBehaviour
     private int coinsCollected = 0; // Monedas recolectadas
     private float shakeTime = 2.0f; // Duración del estado de temblor
 
-    private Dictionary<int, List<int>> connectionRules = new Dictionary<int, List<int>>()
+    // Regla de conexión entre escenarios y obstáculos
+    private Dictionary<int, List<int>> obstacleRules = new Dictionary<int, List<int>>()
     {
-        { 1, new List<int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10 } },
-        { 2, new List<int>{ 1, 3, 5, 7, 9, 10 } },
-        { 3, new List<int>{ 1, 4, 6, 8, 10 } },
-        { 4, new List<int>{ 1, 2, 5, 7, 10 } },
-        { 5, new List<int>{ 1, 3, 6, 8, 10 } },
-        { 6, new List<int>{ 2, 4, 7, 9, 10 } },
-        { 7, new List<int>{ 1, 3, 5, 8, 9, 10 } },
-        { 8, new List<int>{ 2, 4, 6, 9, 10 } },
-        { 9, new List<int>{ 1, 3, 5, 7, 10 } },
-        { 10, new List<int>{ 1, 2, 4, 6, 8, 9 } }
+        { 1, new List<int>{ 1, 2, 3, 4 } },               // Bloque 1 llama a Objeto 1
+        { 2, new List<int>{ 2, 3, 4, 5 } },            // Bloque 2 llama a Objeto 2 o 3
+        { 3, new List<int>{ 3, 4, 5, 6 } },            // Bloque 3 llama a Objeto 3 o 4
+        { 4, new List<int>{ 4, 5, 6, 7 } },            // Bloque 4 llama a Objeto 4 o 5
+        { 5, new List<int>{ 5, 6, 7, 8 } },            // Bloque 5 llama a Objeto 5 o 6
+        { 6, new List<int>{ 6, 7, 8, 9 } },            // Bloque 6 llama a Objeto 6 o 7
+        { 7, new List<int>{ 7, 8, 9, 10 } },            // Bloque 7 llama a Objeto 7 o 8
+        { 8, new List<int>{ 8, 9, 10, 11 } },            // Bloque 8 llama a Objeto 8 o 9
+        { 9, new List<int>{ 9, 10, 11, 12 } },           // Bloque 9 llama a Objeto 9 o 10
+        { 10, new List<int>{ 10, 1, 9, 2 } }           // Bloque 10 llama a Objeto 10 o 1
     };
 
     void Start()
@@ -41,16 +42,6 @@ public class ObjectsController : MonoBehaviour
 
         // Crear la lista de plantillas disponibles al inicio (sin duplicar las activas)
         availableObjects = new List<GameObject>(objetos);
-
-        // Inicializar los 3 objetos visibles
-        for (int i = 0; i < 3; i++)
-        {
-            GameObject newObject = GetNextObject(i == 0 ? 1 : GetObjectIDFromName(activeObjects.Peek().name));
-            newObject.transform.position = new Vector3(0, 0, i * objectDistance);
-            activeObjects.Enqueue(newObject);
-            newObject.SetActive(true);
-            availableObjects.Remove(newObject); // Remover los visibles de los disponibles
-        }
 
         // Inicializar el contador de monedas
         coinsText.text = "Monedas: 0";
@@ -78,15 +69,32 @@ public class ObjectsController : MonoBehaviour
             ResetObject(oldObject); // Resetea las monedas
             oldObject.SetActive(false);
             availableObjects.Add(oldObject); // Devuelve el objeto a los disponibles
-
-            // Colocar un nuevo objeto al final
-            int lastObjectID = GetObjectIDFromName(activeObjects.Last().name);
-            GameObject newObject = GetNextObject(lastObjectID);
-            newObject.transform.position = new Vector3(0, 0, activeObjects.Last().transform.position.z + objectDistance);
-            newObject.SetActive(true);
-            activeObjects.Enqueue(newObject);
-            availableObjects.Remove(newObject); // Remover de los disponibles
         }
+    }
+
+    // Método para generar los obstáculos para un bloque específico en la posición Z del bloque
+    public void SpawnObstaclesForBlock(int blockID, float blockZPosition)
+    {
+        if (!obstacleRules.ContainsKey(blockID)) return;
+
+        // Obtener los obstáculos correspondientes a este bloque
+        List<int> possibleObstacles = obstacleRules[blockID];
+
+        // Elegir uno de los obstáculos aleatoriamente
+        int randomObstacleID = possibleObstacles[Random.Range(0, possibleObstacles.Count)];
+        GameObject obstacleToSpawn = objetos[randomObstacleID - 1]; // Obtener el objeto correspondiente
+
+        // Posicionar el obstáculo en la misma posición Z que el bloque
+        obstacleToSpawn.transform.position = new Vector3(0, 0, blockZPosition);
+        obstacleToSpawn.SetActive(true);
+        activeObjects.Enqueue(obstacleToSpawn);
+        availableObjects.Remove(obstacleToSpawn); // Remover el objeto de los disponibles
+    }
+
+    // Restablecer el estado de los objetos cuando se vuelven a activar
+    void ResetObject(GameObject obj)
+    {
+        obj.SetActive(false); // Desactivar el objeto para ponerlo en reserva
     }
 
     // Método para sumar una moneda al contador
@@ -145,49 +153,5 @@ public class ObjectsController : MonoBehaviour
         coin.SetActive(false); // Desactivar la moneda
         AddCoin(); // Actualizar el contador de monedas
         StartCoroutine(RespawnCoin(coin)); // Reaparecer la moneda después de 3 segundos
-    }
-
-    // Restablecer el estado de las monedas cuando se vuelve a activar una plantilla
-    void ResetObject(GameObject obj)
-    {
-        foreach (Transform child in obj.transform)
-        {
-            if (child.CompareTag("Coin"))
-            {
-                child.gameObject.SetActive(true); // Las monedas vuelven a estar activas
-                Collider coinCollider = child.GetComponent<Collider>();
-                if (coinCollider != null)
-                {
-                    coinCollider.enabled = true; // Asegurar que el Collider esté activo
-                }
-            }
-        }
-    }
-
-    // Obtener el siguiente objeto siguiendo las reglas de conexión
-    GameObject GetNextObject(int lastObjectID)
-    {
-        List<int> possibleObjects = connectionRules[lastObjectID];
-        List<int> availableIDs = new List<int>();
-
-        // Solo seleccionar objetos que no estén activos
-        foreach (int id in possibleObjects)
-        {
-            GameObject candidateObject = objetos[id - 1];
-            if (availableObjects.Contains(candidateObject))
-            {
-                availableIDs.Add(id);
-            }
-        }
-
-        // Seleccionar aleatoriamente uno entre los disponibles
-        int randomObjectID = availableIDs[Random.Range(0, availableIDs.Count)];
-        return objetos[randomObjectID - 1];
-    }
-
-    // Obtener el ID del objeto a partir de su nombre (e.g., "Objeto1" -> 1)
-    int GetObjectIDFromName(string objectName)
-    {
-        return int.Parse(objectName.Replace("Objeto", ""));
     }
 }
