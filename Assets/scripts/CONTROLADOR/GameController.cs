@@ -73,7 +73,7 @@ public class GameController : MonoBehaviour
     {
         Debug.Log("Se envió al menú principal.");
         // Aquí podrías cargar la escena del menú principal usando:
-        // SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("Pantalla_Principal");
     }
 
     // Método para cerrar el juego
