@@ -7,6 +7,7 @@ using System.Linq;
 public class ObjectsController : MonoBehaviour
 {
     public List<GameObject> objetos; // Lista de plantillas (Objetos1, Objetos2, ..., Objetos10)
+    public GameObject objetoTutorial; // Referencia al ObjetoTutorial
     public float startSpeed = 10f; // Velocidad inicial
     public float maxSpeed = 40f; // Velocidad máxima
     public float accelerationRate = 0.1f; // Aceleración por segundo
@@ -24,16 +25,16 @@ public class ObjectsController : MonoBehaviour
     // Regla de conexión entre escenarios y obstáculos
     private Dictionary<int, List<int>> obstacleRules = new Dictionary<int, List<int>>()
     {
-        { 1, new List<int>{ 1, 2, 3, 4 } },               // Bloque 1 llama a Objeto 1
-        { 2, new List<int>{ 2, 3, 4, 5 } },            // Bloque 2 llama a Objeto 2 o 3
-        { 3, new List<int>{ 3, 4, 5, 6 } },            // Bloque 3 llama a Objeto 3 o 4
-        { 4, new List<int>{ 4, 5, 6, 7 } },            // Bloque 4 llama a Objeto 4 o 5
-        { 5, new List<int>{ 5, 6, 7, 8 } },            // Bloque 5 llama a Objeto 5 o 6
-        { 6, new List<int>{ 6, 7, 8, 9 } },            // Bloque 6 llama a Objeto 6 o 7
-        { 7, new List<int>{ 7, 8, 9, 10 } },            // Bloque 7 llama a Objeto 7 o 8
-        { 8, new List<int>{ 8, 9, 10, 11 } },            // Bloque 8 llama a Objeto 8 o 9
-        { 9, new List<int>{ 9, 10, 11, 12 } },           // Bloque 9 llama a Objeto 9 o 10
-        { 10, new List<int>{ 10, 1, 9, 2 } }           // Bloque 10 llama a Objeto 10 o 1
+        { 1, new List<int>{ 1, 2 } },               // Bloque 1 llama a Objeto 1
+        { 2, new List<int>{ 2, 3 } },            // Bloque 2 llama a Objeto 2 o 3
+        { 3, new List<int>{ 3, 4 } },            // Bloque 3 llama a Objeto 3 o 4
+        { 4, new List<int>{ 4, 5 } },            // Bloque 4 llama a Objeto 4 o 5
+        { 5, new List<int>{ 5, 6 } },            // Bloque 5 llama a Objeto 5 o 6
+        { 6, new List<int>{ 6, 7 } },            // Bloque 6 llama a Objeto 6 o 7
+        { 7, new List<int>{ 7, 8 } },            // Bloque 7 llama a Objeto 7 o 8
+        { 8, new List<int>{ 8, 9 } },            // Bloque 8 llama a Objeto 8 o 9
+        { 9, new List<int>{ 9, 10 } },           // Bloque 9 llama a Objeto 9 o 10
+        { 10, new List<int>{ 10, 1 } }           // Bloque 10 llama a Objeto 10 o 1
     };
 
     void Start()
@@ -45,6 +46,10 @@ public class ObjectsController : MonoBehaviour
 
         // Inicializar el contador de monedas
         coinsText.text = "Monedas: 0";
+
+        // Activar el ObjetoTutorial y añadirlo a la lista de objetos activos
+        objetoTutorial.SetActive(true);
+        activeObjects.Enqueue(objetoTutorial);
     }
 
     void Update()
@@ -62,17 +67,17 @@ public class ObjectsController : MonoBehaviour
         }
 
         // Revisar si algún objeto pasó el umbral
-        if (activeObjects.Peek().transform.position.z < objectThreshold)
+        if (activeObjects.Count > 0 && activeObjects.Peek().transform.position.z < objectThreshold)
         {
             // Poner en reserva el objeto que salió de la pantalla
             GameObject oldObject = activeObjects.Dequeue();
-            ResetObject(oldObject); // Resetea las monedas
+            ResetObject(oldObject); // Resetea las monedas y desactiva el objeto
             oldObject.SetActive(false);
             availableObjects.Add(oldObject); // Devuelve el objeto a los disponibles
         }
     }
 
-    // Método para generar los obstáculos para un bloque específico en la posición Z del bloque
+    // Método para generar los obstáculos para un bloque específico
     public void SpawnObstaclesForBlock(int blockID, float blockZPosition)
     {
         if (!obstacleRules.ContainsKey(blockID)) return;
@@ -80,8 +85,21 @@ public class ObjectsController : MonoBehaviour
         // Obtener los obstáculos correspondientes a este bloque
         List<int> possibleObstacles = obstacleRules[blockID];
 
+        // Filtrar los obstáculos que ya están activos para no reutilizarlos
+        List<int> availableObstacleIDs = new List<int>();
+        foreach (int id in possibleObstacles)
+        {
+            GameObject obstacle = objetos[id - 1]; // Los IDs empiezan en 1, pero la lista en 0
+            if (availableObjects.Contains(obstacle))
+            {
+                availableObstacleIDs.Add(id); // Solo añadir obstáculos disponibles
+            }
+        }
+
+        if (availableObstacleIDs.Count == 0) return; // Si no hay obstáculos disponibles, salir
+
         // Elegir uno de los obstáculos aleatoriamente
-        int randomObstacleID = possibleObstacles[Random.Range(0, possibleObstacles.Count)];
+        int randomObstacleID = availableObstacleIDs[Random.Range(0, availableObstacleIDs.Count)];
         GameObject obstacleToSpawn = objetos[randomObstacleID - 1]; // Obtener el objeto correspondiente
 
         // Posicionar el obstáculo en la misma posición Z que el bloque

@@ -7,6 +7,7 @@ public class EnvironmentController : MonoBehaviour
 {
     public List<GameObject> bloques; // Lista de bloques (Bloque1, Bloque2, ..., Bloque10)
     public ObjectsController objectsController; // Referencia al ObjectsController que manejará los obstáculos
+    public GameObject objetoTutorial; // Referencia al ObjetoTutorial que aparecerá en el Bloque1
     public float startSpeed = 10f; // Velocidad inicial del entorno
     public float maxSpeed = 40f; // Velocidad máxima
     public float accelerationRate = 0.1f; // Aceleración por segundo
@@ -38,17 +39,24 @@ public class EnvironmentController : MonoBehaviour
         // Crear la lista de bloques disponibles al inicio (sin duplicar los activos)
         availableBlocks = new List<GameObject>(bloques);
 
-        // Inicializar el primer bloque como Bloque1 y colocarlo en la posición (0, 0, 0)
-        GameObject firstBlock = bloques[0]; // Bloque1
+        // Inicializar el primer bloque como Bloque1
+        GameObject firstBlock = bloques[0]; // Bloque1 siempre es el primer bloque
         firstBlock.transform.position = new Vector3(0, 0, 0); // Posición inicial en (0, 0, 0)
         activeBlocks.Enqueue(firstBlock);
         firstBlock.SetActive(true);
         availableBlocks.Remove(firstBlock); // Remover Bloque1 de los disponibles
 
-        // Generar los otros 2 bloques siguiendo las reglas de conexión
-        for (int i = 1; i < 3; i++)
+        // Colocar el ObjetoTutorial en el primer bloque
+        objetoTutorial.transform.position = new Vector3(0, 0, firstBlock.transform.position.z); // Mover el ObjetoTutorial a la posición del primer bloque
+        objetoTutorial.SetActive(true); // Activar el ObjetoTutorial
+
+        // Llamar al obstáculo para el segundo bloque
+        objectsController.SpawnObstaclesForBlock(1, firstBlock.transform.position.z);
+
+        // Inicializar los otros 2 bloques visibles siguiendo las reglas de conexión
+        for (int i = 1; i < 3; i++) // Modificado para asegurar que 3 bloques se generen
         {
-            GameObject newBlock = GetNextBlock(GetBlockIDFromName(activeBlocks.Last().name));
+            GameObject newBlock = GetNextBlock(i == 1 ? 1 : GetBlockIDFromName(activeBlocks.Last().name));
             newBlock.transform.position = new Vector3(0, 0, activeBlocks.Last().transform.position.z + blockDistance); // Coloca los bloques en secuencia
             activeBlocks.Enqueue(newBlock);
             newBlock.SetActive(true);
@@ -83,6 +91,21 @@ public class EnvironmentController : MonoBehaviour
             availableBlocks.Add(oldBlock); // Devuelve el bloque a los disponibles
 
             // Colocar un nuevo bloque al final de la fila
+            int lastBlockID = GetBlockIDFromName(activeBlocks.Last().name); // Obtener el ID del último bloque activo
+            GameObject newBlock = GetNextBlock(lastBlockID);
+            newBlock.transform.position = new Vector3(0, 0, activeBlocks.Last().transform.position.z + blockDistance); // Posicionar el bloque al final
+            newBlock.SetActive(true);
+            activeBlocks.Enqueue(newBlock);
+            availableBlocks.Remove(newBlock);
+
+            // Llamar a los obstáculos correspondientes para este bloque
+            int blockID = GetBlockIDFromName(newBlock.name);
+            objectsController.SpawnObstaclesForBlock(blockID, newBlock.transform.position.z); // Llamar al obstáculo
+        }
+
+        // Verificar que siempre haya 3 bloques activos
+        while (activeBlocks.Count < 3) // Asegurar siempre tener 3 bloques visibles
+        {
             int lastBlockID = GetBlockIDFromName(activeBlocks.Last().name); // Obtener el ID del último bloque activo
             GameObject newBlock = GetNextBlock(lastBlockID);
             newBlock.transform.position = new Vector3(0, 0, activeBlocks.Last().transform.position.z + blockDistance); // Posicionar el bloque al final
