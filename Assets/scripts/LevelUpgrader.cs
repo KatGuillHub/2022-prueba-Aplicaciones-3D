@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class LevelUpgrader : MonoBehaviour
 {
@@ -13,16 +14,19 @@ public class LevelUpgrader : MonoBehaviour
 
     //definir monedas necesarias para nivel
     public int[] upgradecosts = { 5, 10, 15, 20, 25 };
-
-    //posible borrar
-    //public int[] upgradeCosts; // Costos de mejora para cada nivel
-    //private int currentLevel = 0; // Nivel actual
-    //
+    public TMP_Text noCoinsMessage; //referencia al texto "no monedas"
+    public GameObject backgroundInsufficientFunds; //referencia al fondo de no monedas
 
     void Start()
     {
         mostrar_monedas = FindObjectOfType<mostrar_monedas>(); // Busca el mostrar_monedas en la escena
         UpdateUI();
+
+        //ocultar el mensaje al inicio
+        if (noCoinsMessage != null)
+        {
+            noCoinsMessage.gameObject.SetActive(false);
+        }
     }
 
     public void UpgradeLevel()
@@ -47,6 +51,7 @@ public class LevelUpgrader : MonoBehaviour
             else
             {
                 // Mensaje de no suficientes monedas
+                StartCoroutine(ShowNoCoinsMessage()); //mostar el mensaje "faltan monedas"
                 Debug.Log("No tienes suficientes monedas para mejorar.");
             }
         }
@@ -67,6 +72,23 @@ public class LevelUpgrader : MonoBehaviour
         else
         {
             Debug.LogError("Sprite no disponible o fuera de rango en el nivel " + currentlevel);
+        }
+    }
+
+    private IEnumerator ShowNoCoinsMessage()
+    {
+        if (noCoinsMessage != null)
+        {
+            //activo texto y fondo
+            noCoinsMessage.gameObject.SetActive(true); //mostrar el mensaje
+            backgroundInsufficientFunds.SetActive(true);
+
+            //espero dos segundos
+            yield return new WaitForSeconds(2); //mostrar por 2 segundos
+
+            //desactivo texto y fondo
+            noCoinsMessage.gameObject.SetActive(false); //ocultar el mensaje
+            backgroundInsufficientFunds.SetActive(false);
         }
     }
 }

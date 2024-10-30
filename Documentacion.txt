@@ -1,0 +1,463 @@
+Universidad Militar Nueva Granada
+
+- Guillermo Andres Campo Benjumea
+- Juan Esteban Sanchez Rincon
+- Camilo Andres Cubillos Ferrer
+- Juan Sebastian Koshmieder Lagos
+- Sergio David Trujillo Becerra
+
+Aplicaciones 3D - 2024
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Código: ButtonManager
+Descripción General
+El código es un script de Unity escrito en C# que maneja las interacciones de varios botones en una interfaz de usuario. 
+Este script incluye varias funciones que se ejecutan cuando se presionan los botones, utilizando el Debug.Log para mostrar mensajes y SceneManager para cambiar
+entre diferentes escenas. Se trata de un manejador básico de botones para un juego, que responde a eventos de clic.
+
+using UnityEngine;
+using UnityEngine.SceneManagement; // Importa SceneManager para gestionar escenas
+
+// Clase ButtonManager que gestiona las acciones de los botones en el juego
+public class ButtonManager : MonoBehaviour
+{
+    // Método que se ejecuta al presionar el botón "Jugar"
+    // Muestra un mensaje en la consola
+    public void OnJugarButtonClicked()
+    {
+        Debug.Log("Boton Jugar presionado");
+        // Aquí se podría cargar la escena del juego si fuera necesario
+    }
+
+    // Método que se ejecuta al presionar el botón "Opciones"
+    // Carga la escena "Escena_Opciones"
+    public void OnOpcionesButtonClicked()
+    {
+        Debug.Log("Boton Opciones presionado");
+        SceneManager.LoadScene("Escena_Opciones");
+    }
+
+    // Método que se ejecuta al presionar el botón "Garaje"
+    // Carga la escena "Escena_Garaje"
+    public void OnGarajeButtonClicked()
+    {
+        Debug.Log("Boton Garaje presionado");
+        SceneManager.LoadScene("Escena_Garaje");
+    }
+
+    // Método que se ejecuta al presionar el botón "Jugador"
+    // Muestra un mensaje en la consola
+    public void OnJugadorButtonClicked()
+    {
+        Debug.Log("Boton Jugador Presionado");
+    }
+
+    // Método que se ejecuta al presionar el botón "Atrás"
+    // Carga la escena principal del menú "Pantalla_Principal"
+    public void OnAtrasButtonClicked()
+    {
+        Debug.Log("Boton Atras Presionado");
+        SceneManager.LoadScene("Pantalla_Principal");
+    }
+
+    // Método que se ejecuta al presionar el botón "Música"
+    // Muestra un mensaje en la consola
+    public void OnMusicaButtonClicked()
+    {
+        Debug.Log("Boton Musica Presionado");
+        // Se puede añadir funcionalidad adicional para manejar el audio del juego
+    }
+
+    // Método que se ejecuta al presionar el botón "Efectos"
+    public void OnEfectosButtonClicked()
+    {
+        Debug.Log("Boton Efectos Presionado");
+        // Aquí se puede manejar la activación o desactivación de efectos sonoros
+    }
+
+    // Método que se ejecuta al presionar el botón "Idioma"
+    public void OnIdiomaButtonClicked()
+    {
+        Debug.Log("Boton Idioma Presionado");
+        // Posible implementación para cambiar el idioma del juego
+    }
+
+    // Método que se ejecuta al presionar el botón "Quit"
+    // Cierra la aplicación
+    public void OnQuitButtonClicked()
+    {
+        Debug.Log("Boton Quit Presionado");
+        Application.Quit(); // Cierra la aplicación cuando se está en una build final
+    }
+}
+
+Explicación de cada método:
+OnJugarButtonClicked:
+Este método se ejecuta al presionar el botón "Jugar". Actualmente, sólo muestra un mensaje en la consola indicando que el botón fue presionado. 
+Se podría modificar para iniciar el juego.
+
+OnOpcionesButtonClicked:
+Al presionar el botón "Opciones", se carga la escena "Escena_Opciones" usando SceneManager.LoadScene. 
+Esto se usa comúnmente para cambiar a una pantalla de configuración del juego.
+
+OnGarajeButtonClicked:
+Este método carga la escena del garaje ("Escena_Garaje") donde posiblemente el jugador pueda seleccionar vehículos o realizar personalizaciones.
+
+OnJugadorButtonClicked:
+Al presionar el botón "Jugador", sólo muestra un mensaje en la consola. Puede usarse para acciones futuras relacionadas con el jugador.
+
+OnAtrasButtonClicked:
+Este botón carga la escena principal del juego, llamada "Pantalla_Principal", probablemente regresando al menú principal.
+
+OnMusicaButtonClicked y OnEfectosButtonClicked:
+Estos métodos muestran mensajes relacionados con la música y los efectos. 
+Aquí se podrían implementar funcionalidades para activar/desactivar música y efectos sonoros.
+
+OnIdiomaButtonClicked:
+Este método podría usarse para cambiar el idioma del juego. Actualmente, solo muestra un mensaje.
+
+OnQuitButtonClicked:
+Este método cierra la aplicación cuando se presiona el botón "Quit", lo que es útil para finalizar el juego cuando se está en la versión final (build).
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Código: cambio_boton_efectos
+
+Descripción del Código
+Este script se utiliza para cambiar la imagen de un botón en Unity dependiendo del estado de los efectos de sonido. 
+El botón alterna entre dos imágenes: una que representa los efectos encendidos y otra para los efectos apagados. Al hacer clic, el botón cambia la imagen y alterna el estado de los efectos.
+
+Explicación de los Componentes:
+Variables Públicas:
+1. public Sprite EffectsOnSprite: Imagen que representa el estado de los efectos encendidos. Esta imagen se asigna en el Inspector de Unity.
+2. public Sprite EffectsOffSprite: Imagen que representa el estado de los efectos apagados. Esta imagen también se asigna en el Inspector de Unity.
+
+Variables Privadas:
+1. private bool isEffectsOn = true: Variable que guarda el estado actual de los efectos. Se inicializa en `true`, suponiendo que los efectos están encendidos.
+2. private Button button: Referencia al componente `Button` del objeto que lleva este script.
+
+Métodos:
+1. void Start(): Este método se ejecuta cuando el script se inicializa. Obtiene el componente `Button` del objeto en el que está aplicado el script y añade un listener al evento `onClick` del botón,
+para llamar al método `ToggleMusic` cuando se hace clic en el botón.
+
+Código:
+button = GetComponent<Button>();
+button.onClick.AddListener(ToggleMusic);
+
+2. void ToggleMusic():Este método se ejecuta cada vez que se hace clic en el botón. Verifica el estado actual de los efectos mediante `isEffectsOn`. 
+Si es `true`, cambia la imagen del botón a `EffectsOffSprite` y apaga los efectos; si es `false`, cambia la imagen a `EffectsOnSprite` y enciende los efectos.
+
+Código:
+if (isEffectsOn)
+{
+button.image.sprite = EffectsOffSprite;
+// Aquí también puedes poner el código para apagar la música
+}
+else
+{
+button.image.sprite = EffectsOnSprite;
+// Aquí puedes poner el código para encender la música
+}
+isEffectsOn = !isEffectsOn;
+
+Detalles Adicionales:
+- Alternancia del Estado: La variable `isEffectsOn` alterna su valor entre `true` y `false` en cada clic mediante la línea `isEffectsOn = !isEffectsOn. 
+Esto permite que el botón mantenga el estado correcto entre encendido y apagado.
+- Personalización: Si se quiere realizar alguna acción adicional cuando los efectos se activan o desactivan, se puede añadir el código respectivo en los bloques `if` y `else` dentro de `ToggleMusic`.
+
+Asignación en Unity:
+Para utilizar este script:
+1. Asigna el script a un objeto que contenga un componente `Button`.
+2. En el Inspector, asigna las imágenes `EffectsOnSprite` y `EffectsOffSprite`.
+3. Al presionar Play y hacer clic en el botón, verás que la imagen cambia entre las dos asignadas, simulando el encendido y apagado de los efectos.
+
+Este script es útil para implementar un botón de "toggle" visualmente intuitivo en una interfaz de usuario en Unity.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Codigo: cambio_boton_musica
+
+Descripción del Código
+Este script se utiliza para cambiar la imagen de un botón en Unity dependiendo del estado de la música. 
+El botón alterna entre dos imágenes: una que representa la música encendida y otra que representa la música apagada. Al hacer clic, el botón cambia la imagen y alterna el estado de la música.
+
+Explicación de los Componentes:
+Variables Públicas:
+1. public Sprite musicOnSprite: Imagen que representa el estado de la música encendida. Esta imagen se asigna en el Inspector de Unity.
+2. public Sprite musicOffSprite: Imagen que representa el estado de la música apagada. Esta imagen también se asigna en el Inspector de Unity.
+
+Variables Privadas:
+1. private bool isMusicOn = true: Variable que guarda el estado actual de la música. Se inicializa en `true`, suponiendo que la música está encendida.
+2. private Button button: Referencia al componente `Button` del objeto que lleva este script.
+
+Métodos:
+
+1. void Start(): Este método se ejecuta cuando el script se inicializa. Obtiene el componente `Button` del objeto en el que está aplicado el script y añade un listener al evento `onClick` del botón, 
+para llamar al método `ToggleMusic` cuando se hace clic en el botón.
+
+Código:
+button = GetComponent<Button>();
+button.onClick.AddListener(ToggleMusic);
+
+2. void ToggleMusic(): Este método se ejecuta cada vez que se hace clic en el botón. Verifica el estado actual de la música mediante `isMusicOn`. Si es `true`, cambia la imagen del botón a `musicOffSprite` 
+y apaga la música; si es `false`, cambia la imagen a `musicOnSprite` y enciende la música.
+
+Código:
+if (isMusicOn)
+{
+button.image.sprite = musicOffSprite;
+// Aquí también puedes poner el código para apagar la música
+}
+else
+{
+button.image.sprite = musicOnSprite;
+// Aquí puedes poner el código para encender la música
+}
+isMusicOn = !isMusicOn;
+
+Detalles Adicionales:
+- Alternancia del Estado: La variable `isMusicOn` alterna su valor entre `true` y `false` en cada clic mediante la línea `isMusicOn = !isMusicOn. 
+Esto permite que el botón mantenga el estado correcto entre encendido y apagado.
+- Personalización: Si se quiere realizar alguna acción adicional cuando la música se activa o desactiva, se puede añadir el código respectivo en los bloques `if` y `else` dentro de `ToggleMusic`.
+
+Asignación en Unity:
+utilizar este script:
+1. Asigna el script a un objeto que contenga un componente `Button`.
+2. En el Inspector, asigna las imágenes `musicOnSprite` y `musicOffSprite`.
+3. Al presionar Play y hacer clic en el botón, verás que la imagen cambia entre las dos asignadas, simulando el encendido y apagado de la música.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Codigo: CharacterSelection
+
+Descripción del Código:
+Este script permite seleccionar entre dos personajes (masculino y femenino) mostrando una imagen correspondiente al personaje seleccionado. Utiliza botones para alternar entre las imágenes de los personajes.
+
+Explicación de los Componentes:
+Variables Públicas:
+1. public RawImage maleImage: Representa la imagen renderizada del personaje masculino. Se asigna en el Inspector de Unity.
+2. public RawImage femaleImage: Representa la imagen renderizada del personaje femenino. También se asigna en el Inspector.
+3. public Button maleButton: Botón que, al presionarlo, selecciona el personaje masculino.
+4. public Button femaleButton: Botón que, al presionarlo, selecciona el personaje femenino.
+
+Métodos:
+1. void Start(): Este método se llama al inicio del juego y se utiliza para inicializar el estado del script. 
+Aquí se desactiva la imagen femenina por defecto y se asignan las funciones de los botones para que respondan a los clics.
+
+Código:
+femaleImage.gameObject.SetActive(false); // Desactiva la imagen femenina por defecto
+maleButton.onClick.AddListener(ShowMaleCharacter); // Asigna la función para el botón masculino
+femaleButton.onClick.AddListener(ShowFemaleCharacter); // Asigna la función para el botón femenino
+
+2. void ShowMaleCharacter(): Este método se llama cuando se hace clic en el botón masculino. Activa la imagen del personaje masculino y desactiva la imagen del personaje femenino.
+Código:
+maleImage.gameObject.SetActive(true);
+femaleImage.gameObject.SetActive(false);
+
+3. void ShowFemaleCharacter(): Este método se llama cuando se hace clic en el botón femenino. Activa la imagen del personaje femenino y desactiva la imagen del personaje masculino.
+Código:
+maleImage.gameObject.SetActive(false);
+femaleImage.gameObject.SetActive(true);
+
+Detalles Adicionales:
+- Activación/Desactivación de Imágenes: Las imágenes de los personajes se activan y desactivan usando `SetActive`, lo que permite mostrar solo el personaje seleccionado en un momento dado.
+- Interacción del Usuario: Este script es una manera sencilla de permitir que los usuarios seleccionen entre dos opciones de personajes en la interfaz de usuario.
+
+Asignación en Unity:
+Para usar este script:
+1. Crea un objeto vacío en la escena y asigna el script `CharacterSelection` a este objeto.
+2. En el Inspector, asigna las imágenes de los personajes y los botones correspondientes.
+3. Cuando se ejecuta el juego y se hacen clics en los botones, se alternarán las imágenes del personaje en la pantalla.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Codigo: coloresbici
+
+Descripción del Código:
+Este script permite cambiar el color de un modelo de bicicleta en respuesta a los clics de botones. 
+Se configura un array de botones que, al ser presionados, cambiarán el color del modelo de la bicicleta a uno de los colores disponibles.
+
+Explicación de los Componentes:
+Variables Públicas:
+1. public Renderer biciRenderer: Referencia al componente `Renderer` del modelo de la bicicleta, que es el que permite cambiar el material y el color del objeto.
+2. public Button[] botonesColor: Un array de botones que el usuario puede presionar para seleccionar el color de la bicicleta.
+3. public Color[] coloresDisponibles: Un array de colores que se pueden aplicar a la bicicleta. Cada botón corresponde a un color en este array.
+
+Métodos:
+1. void Start(): Este método se llama al inicio del juego y se utiliza para asignar la función de cambio de color a cada botón.
+
+Código:
+for (int i = 0; i < botonesColor.Length; i++)
+{
+int indice = i; // Necesario para evitar problemas de referencia en el loop
+botonesColor[i].onClick.AddListener(() => CambiarColor(indice));
+}
+- Detalles: Se utiliza un bucle `for` para recorrer cada botón en el array `botonesColor`. Se guarda el índice en una variable local `indice` para evitar problemas de cierre de variables en los eventos de clic.
+
+2. public void CambiarColor(int indiceColor): Este método cambia el color del modelo de la bicicleta al color seleccionado por el botón.
+
+Código:
+biciRenderer.material.color = coloresDisponibles[indiceColor];
+Debug.Log("Color cambiado a: " + coloresDisponibles[indiceColor]);
+Detalles: Cambia el color del material de la bicicleta al color correspondiente en el array `coloresDisponibles` según el índice pasado como argumento. Además, 
+imprime un mensaje en la consola para confirmar el cambio de color.
+
+Detalles Adicionales:
+- Interacción del Usuario: Este script permite al usuario seleccionar diferentes colores para la bicicleta, mejorando la personalización en la interfaz del juego.
+- Uso de Renderer: Asegúrate de que el modelo de la bicicleta tenga un componente `Renderer` asignado correctamente para que el color cambie visualmente en la escena.
+
+Asignación en Unity:
+Para utilizar este script:
+1. Crea un objeto vacío en la escena y asigna el script `coloresbici` a este objeto.
+2. En el Inspector, asigna el componente `Renderer` del modelo de la bicicleta y los botones que corresponden a los colores.
+3. Define los colores disponibles en el array `coloresDisponibles`, ya sea en el Inspector o mediante código.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Codigo: colorescasco
+
+Descripción del Código:
+El script `colorescasco` permite cambiar el color de un modelo de casco en respuesta a la interacción del usuario a través de botones. Cada botón corresponde a un color que se puede aplicar al casco.
+
+Explicación de los Componentes:
+Variables Públicas:
+1. public Renderer cascoRenderer: Referencia al componente `Renderer` del modelo del casco, que es necesario para cambiar el material y el color del objeto.
+2. public Button[] botonesColor2: Un array de botones que el usuario puede presionar para seleccionar un color para el casco.
+3. public Color[] coloresDisponibles2: Un array de colores que se pueden aplicar al casco. Cada botón está asociado a un color en este array.
+
+Métodos:
+1. void Start(): Este método se llama al inicio del juego y se utiliza para asignar la función de cambio de color a cada botón.
+
+Código:
+for (int i = 0; i < botonesColor2.Length; i++)
+{
+int indice = i; // Necesario para evitar problemas de referencia en el loop
+botonesColor2[i].onClick.AddListener(() => CambiarColor2(indice));
+}
+
+- Detalles: Se utiliza un bucle `for` para recorrer cada botón en el array `botonesColor2`. Se guarda el índice en una variable local `indice` para evitar problemas de referencia en el contexto del evento.
+
+2. public void CambiarColor2(int indiceColor): Este método cambia el color del modelo del casco al color seleccionado por el botón.
+
+Código:
+cascoRenderer.material.color = coloresDisponibles2[indiceColor];
+Debug.Log("Color cambiado a: " + coloresDisponibles2[indiceColor]);
+
+- Detalles: Cambia el color del material del casco al color correspondiente en el array `coloresDisponibles2` según el índice pasado como argumento. Además, imprime un mensaje en la consola para confirmar el cambio de color.
+
+Detalles Adicionales:
+- Interacción del Usuario: Este script permite al usuario seleccionar diferentes colores para el casco, lo que mejora la personalización en la interfaz del juego.
+- Uso de Renderer: Asegúrate de que el modelo del casco tenga un componente `Renderer` asignado correctamente para que el color cambie visualmente en la escena.
+
+Asignación en Unity:
+Para utilizar este script:
+1. Crea un objeto vacío en la escena y asigna el script `colorescasco` a este objeto.
+2. En el Inspector, asigna el componente `Renderer` del modelo del casco y los botones que corresponden a los colores.
+3. Define los colores disponibles en el array `coloresDisponibles2`, ya sea en el Inspector o mediante código.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Codigo: LevelUpgrader
+
+Descripción del Código:
+El script `LevelUpgrader` permite a los jugadores avanzar a través de diferentes niveles de mejoras, mostrando el nivel actual y una imagen asociada a cada mejora.
+
+Explicación de los Componentes:
+
+Variables Públicas:
+1. public TMP_Text levelText: Un componente de texto de TextMeshPro que muestra el nivel actual (por ejemplo, "Nivel 1", "Nivel 2", etc.).
+2. public Image mejoraImage: Un componente `Image` que muestra la imagen de la mejora actual.
+3. public Sprite[] mejoraSprites: Un array de sprites que contiene las imágenes de las mejoras para cada nivel.
+
+Variables Privadas:
+1. private int currentLevel = 0: Una variable entera que mantiene el nivel actual del jugador, comenzando en 0 (Nivel 1).
+
+Métodos:
+1. void Start(): Este método se llama al inicio del juego y se utiliza para actualizar la interfaz de usuario con el estado inicial.
+
+Código:
+UpdateUI();
+
+- Detalles: Llama al método `UpdateUI` para mostrar el nivel inicial y la imagen correspondiente.
+
+2. public void NextLevel(): Aumenta el nivel actual y actualiza la interfaz de usuario si no se ha alcanzado el nivel máximo.
+
+Código:
+if (currentLevel < mejoraSprites.Length - 1)
+{
+currentLevel++;
+UpdateUI();
+}
+
+- Detalles: Comprueba que el nivel actual sea menor que el último índice del array `mejoraSprites` antes de incrementar el nivel y actualizar la UI.
+
+3. public void PreviousLevel(): Disminuye el nivel actual y actualiza la interfaz de usuario si no se está en el nivel mínimo.
+
+Código:
+if (currentLevel > 0)
+{
+currentLevel--;
+UpdateUI();
+}
+- Detalles: Verifica que el nivel actual sea mayor que 0 antes de decrementar el nivel y actualizar la UI.
+
+4. private void UpdateUI(): Actualiza el texto del nivel y la imagen de la mejora actual en la UI.
+
+Código:
+levelText.text = "Nivel " + (currentLevel + 1).ToString(); // Actualiza el texto del nivel
+mejoraImage.sprite = mejoraSprites[currentLevel]; // Cambia la imagen de la mejora
+
+- Detalles: Actualiza el texto para mostrar el nivel actual y cambia la imagen a la correspondiente al `currentLevel`. También incluye un mensaje de error si el sprite está fuera de rango.
+
+Detalles Adicionales:
+- Interacción del Usuario: Los métodos `NextLevel` y `PreviousLevel` pueden ser llamados a través de botones en la interfaz de usuario para que los jugadores puedan navegar entre los niveles de mejora.
+- Uso de TextMeshPro: Asegúrate de que el componente `TMP_Text` está configurado correctamente en Unity y que los sprites están asignados en el Inspector para evitar errores de referencia.
+
+Asignación en Unity:
+Para utilizar este script:
+1. Crea un objeto vacío en la escena y asigna el script `LevelUpgrader` a este objeto.
+2. En el Inspector, asigna los componentes `TMP_Text` y `Image` correspondientes.
+3. Define los sprites de las mejoras en el array `mejoraSprites` a través del Inspector.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Codigo: OpcionesController
+
+Descripción del Código:
+El script `OpcionesController` permite mostrar y ocultar dos paneles en la interfaz: uno para las opciones y otro para los créditos. Esto facilita la navegación dentro del menú del juego.
+
+Explicación de los Componentes:
+Variables Públicas:
+1. public GameObject panelOpciones: Este objeto representa el panel que contiene las opciones del juego. Debe estar asociado en el Inspector de Unity.
+2. public GameObject panelCreditos: Este objeto representa el panel que muestra la información de los créditos del juego. También debe estar configurado en el Inspector.
+
+Métodos:
+1. public void MostrarOpciones(): Este método activa el panel de opciones cuando se llama, haciéndolo visible en la interfaz.
+
+Código:
+panelOpciones.SetActive(true);
+
+- Detalles: Llama al método `SetActive(true)` en el objeto `panelOpciones`, permitiendo que los usuarios vean las opciones disponibles.
+
+2. public void OcultarOpciones(): Este método oculta el panel de opciones al desactivarlo.
+
+Código:
+panelOpciones.SetActive(false);
+
+- Detalles: Utiliza `SetActive(false)` para ocultar el panel de opciones, lo que permite que el usuario regrese al menú principal.
+
+3. public void MostrarCreditos(): Este método activa el panel de créditos, permitiendo al jugador ver la información de los desarrolladores o cualquier otro crédito relevante.
+
+Código:
+panelCreditos.SetActive(true);
+
+- Detalles: Similar a `MostrarOpciones`, activa el panel de créditos.
+
+4. public void OcultarCreditos(): Este método oculta el panel de créditos, devolviendo al usuario a la interfaz anterior.
+
+Código:
+panelCreditos.SetActive(false);
+
+- Detalles: Desactiva el panel de créditos.
+
+Detalles Adicionales:
+- Interacción del Usuario: Estos métodos pueden ser llamados desde botones en la interfaz de usuario mediante el sistema de eventos de Unity, utilizando el componente `Button` y 
+asignando las funciones correspondientes en el Inspector.
+- Configuración en Unity: Asegúrate de arrastrar y soltar los paneles `panelOpciones` y `panelCreditos` en sus respectivas variables en el Inspector después de asignar este script a un GameObject.
+
+Asignación en Unity:
+Para utilizar este script en Unity:
+1. Crea un objeto vacío en tu escena y asígnale el script `OpcionesController`.
+2. En el Inspector, arrastra el objeto del panel de opciones y el panel de créditos a las variables correspondientes del script.
+3. Configura los botones en la interfaz de usuario para llamar a los métodos `MostrarOpciones`, `OcultarOpciones`, `MostrarCreditos` y `OcultarCreditos` según sea necesario.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
