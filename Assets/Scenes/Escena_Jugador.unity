@@ -283,11 +283,11 @@ MonoBehaviour:
   levelText: {fileID: 1915052297}
   mejoraImage: {fileID: 1965195045}
   mejoraSprites:
-  - {fileID: 21300000, guid: 593e24d1f32b2e44589727e7f1e2a82b, type: 3}
-  - {fileID: 21300000, guid: 593e24d1f32b2e44589727e7f1e2a82b, type: 3}
-  - {fileID: 21300000, guid: 593e24d1f32b2e44589727e7f1e2a82b, type: 3}
-  - {fileID: 21300000, guid: 593e24d1f32b2e44589727e7f1e2a82b, type: 3}
-  - {fileID: 21300000, guid: 593e24d1f32b2e44589727e7f1e2a82b, type: 3}
+  - {fileID: 21300000, guid: 7b8b82aea5a517640971d6dd0f99b0f3, type: 3}
+  - {fileID: 21300000, guid: ba4c6b7f1ba299747b3c5cf794b09b0a, type: 3}
+  - {fileID: 21300000, guid: 644ab5fbe777ef347b21f2c3210e44de, type: 3}
+  - {fileID: 21300000, guid: 65ea21cb38111bf41a96b88c6b1f2ba3, type: 3}
+  - {fileID: 21300000, guid: 34ec5e731304fa2419f9f8faa5e9f9b0, type: 3}
   upgradecosts: 050000000a0000000f0000001400000019000000
   noCoinsMessage: {fileID: 1411697085}
   backgroundInsufficientFunds: {fileID: 1817685141}
