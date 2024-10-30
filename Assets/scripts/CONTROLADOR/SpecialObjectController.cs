@@ -6,61 +6,67 @@ using UnityEngine.UI;
 
 public class SpecialEventController : MonoBehaviour
 {
-    public GameObject gamePreguntaUI; // Referencia al Canvas de la actividad de pregunta
-    public GameObject gameContadorUI; // Referencia al Canvas del contador de 3 segundos
-    public GameObject gameOverUI; // Referencia al Canvas de Fin de Juego
-    public TextMeshProUGUI tenSecText; // Referencia al texto del contador de 10 segundos
-    public TextMeshProUGUI contadorText; // Referencia al texto del contador de 3 segundos
-    public PlayerController player; // Referencia al PlayerController para pausar/reanudar el juego
-    public List<GameObject> specialObjects; // Lista de objetos especiales que activan el evento
+    public List<GamePreguntaData> preguntasData; // Lista de datos para cada pregunta
+    public GameObject gameContadorUI; // Canvas del contador de 3 segundos
+    public TextMeshProUGUI contadorText; // Texto del contador de 3 segundos
+    public PlayerController player; // Referencia al PlayerController
+    public List<GameObject> specialObjects; // Lista de objetos especiales
     public TextMeshProUGUI coinsText; // Texto de monedas
-    public Button correctAnswerButton; // Botón de la respuesta correcta
-    public List<Button> incorrectAnswerButtons; // Lista de botones de respuestas incorrectas
     public int rewardCoins = 25; // Monedas ganadas por respuesta correcta
-    public int penaltyCoins = 10; // Monedas perdidas si no responde
-    public Collider playerCollider; // Referencia al collider del Player
+    public int penaltyCoins = 10; // Monedas perdidas si responde mal o no responde
+    public Collider playerCollider; // Collider del Player
 
-    private bool isSpecialActive = false; // Para saber si el evento especial está activo
-    private int coinsCollected = 0; // Almacenar las monedas obtenidas
+    private bool isSpecialActive = false; // Indica si el evento especial está activo
+    private int coinsCollected = 0; // Monedas obtenidas
+    private int currentQuestionIndex = -1; // Índice de la pregunta actual
 
     private void Start()
     {
-        gamePreguntaUI.SetActive(false); // Ocultar el UI de preguntas al inicio
-        gameContadorUI.SetActive(false); // Ocultar el UI de contador al inicio
-        gameOverUI.SetActive(false); // Ocultar el UI de Fin de Juego al inicio
+        // Desactivar todas las UIs de pregunta y el contador de 3 segundos al iniciar
+        foreach (var pregunta in preguntasData) pregunta.preguntaUI.SetActive(false);
+        gameContadorUI.SetActive(false);
 
-        // Asignar las funciones a los botones
-        correctAnswerButton.onClick.AddListener(CorrectAnswerSelected); // Botón de respuesta correcta
-        foreach (var button in incorrectAnswerButtons)
+        // Asignar eventos de clic a los botones de respuesta
+        for (int i = 0; i < preguntasData.Count; i++)
         {
-            button.onClick.AddListener(IncorrectAnswerSelected); // Botones de respuestas incorrectas
+            int index = i; // Guardar el índice actual
+            preguntasData[index].correctButton.onClick.AddListener(() => CorrectAnswerSelected(index));
+            preguntasData[index].incorrectButton1.onClick.AddListener(() => IncorrectAnswerSelected(index));
+            preguntasData[index].incorrectButton2.onClick.AddListener(() => IncorrectAnswerSelected(index));
         }
 
-        // Configurar los objetos especiales
+        // Configurar los objetos especiales con el tag y el collider necesarios
         foreach (var specialObject in specialObjects)
         {
-            Collider collider = specialObject.GetComponent<Collider>();
-            if (collider == null)
-            {
-                collider = specialObject.AddComponent<BoxCollider>();
-                collider.isTrigger = true;
-            }
-            specialObject.tag = "Special"; // Asignar el tag "Special"
+            Collider collider = specialObject.GetComponent<Collider>() ?? specialObject.AddComponent<BoxCollider>();
+            collider.isTrigger = true;
+            specialObject.tag = "Special";
         }
 
-        UpdateCoinText(); // Inicializar el texto de monedas
+        UpdateCoinText();
     }
 
     private void Update()
     {
-        // Revisar colisiones con el Player
+        // Bloquear teclas Escape, Espacio mientras la pregunta o el contador están activos
+        if (preguntasData.Exists(p => p.preguntaUI.activeSelf) || gameContadorUI.activeSelf)
+        {
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Escape))
+            {
+                Debug.Log("Espacio y Escape están desactivados durante el evento especial.");
+            }
+            return;
+        }
+
+        // Verificar si colisiona con algún objeto especial
         foreach (GameObject specialObject in specialObjects)
         {
             if (specialObject != null && IsCollidingWithPlayer(specialObject))
             {
                 if (!isSpecialActive)
                 {
-                    StartCoroutine(HandleSpecialCollision(specialObject)); // Manejar la colisión con un objeto especial
+                    int questionIndex = specialObjects.IndexOf(specialObject);
+                    StartCoroutine(HandleSpecialCollision(specialObject, questionIndex));
                 }
                 break;
             }
@@ -73,9 +79,10 @@ public class SpecialEventController : MonoBehaviour
         return specialCollider != null && playerCollider.bounds.Intersects(specialCollider.bounds);
     }
 
-    IEnumerator HandleSpecialCollision(GameObject specialObject)
+    IEnumerator HandleSpecialCollision(GameObject specialObject, int questionIndex)
     {
         isSpecialActive = true;
+        currentQuestionIndex = questionIndex;
 
         // Desactivar el collider del objeto especial
         Collider specialCollider = specialObject.GetComponent<Collider>();
@@ -84,40 +91,39 @@ public class SpecialEventController : MonoBehaviour
             specialCollider.enabled = false;
         }
 
-        yield return new WaitForSeconds(0.08f); // Esperar 0.5 segundos antes de mostrar la pregunta
-
-        StartCoroutine(StartSpecialEvent()); // Iniciar el evento especial
+        // Esperar 0.5 segundos y activar la UI de pregunta
+        yield return new WaitForSeconds(0.1f);
+        StartCoroutine(StartSpecialEvent(questionIndex));
     }
 
-    IEnumerator StartSpecialEvent()
+    IEnumerator StartSpecialEvent(int questionIndex)
     {
-        // Pausar el juego
         Time.timeScale = 0f;
         player.enabled = false;
 
-        // Activar el UI de preguntas y empezar el temporizador
-        gamePreguntaUI.SetActive(true);
-        StartCoroutine(CountdownTenSeconds());
+        // Activar la pregunta correspondiente
+        preguntasData[questionIndex].preguntaUI.SetActive(true);
+        StartCoroutine(CountdownTenSeconds(questionIndex));
 
-        yield return new WaitForSecondsRealtime(10f); // Esperar 10 segundos en tiempo real
+        yield return new WaitForSecondsRealtime(10f);
 
-        // Si no respondió en el tiempo límite, restar monedas
-        if (gamePreguntaUI.activeSelf)
+        // Si no se ha respondido en 10 segundos, aplicar penalización
+        if (preguntasData[questionIndex].preguntaUI.activeSelf)
         {
             AddCoins(-penaltyCoins);
             Debug.Log("No respondiste a tiempo, -10 monedas.");
-            gamePreguntaUI.SetActive(false);
-            gameContadorUI.SetActive(true); // Activar el contador de 3 segundos
-            StartCoroutine(CountdownThreeSeconds()); // Iniciar el contador de 3 segundos
+            preguntasData[questionIndex].preguntaUI.SetActive(false);
+            gameContadorUI.SetActive(true);
+            StartCoroutine(CountdownThreeSeconds());
         }
     }
 
-    IEnumerator CountdownTenSeconds()
+    IEnumerator CountdownTenSeconds(int questionIndex)
     {
         for (int i = 10; i > 0; i--)
         {
-            tenSecText.text = i.ToString(); // Actualizar el texto del contador de 10 segundos
-            yield return new WaitForSecondsRealtime(1f); // Esperar un segundo en tiempo real
+            preguntasData[questionIndex].tenSecText.text = i.ToString();
+            yield return new WaitForSecondsRealtime(1f);
         }
     }
 
@@ -125,44 +131,54 @@ public class SpecialEventController : MonoBehaviour
     {
         for (int i = 3; i > 0; i--)
         {
-            contadorText.text = i.ToString(); // Actualizar el texto del contador de 3 segundos
-            yield return new WaitForSecondsRealtime(1f); // Esperar un segundo en tiempo real
+            contadorText.text = i.ToString();
+            yield return new WaitForSecondsRealtime(1f);
         }
 
-        // Ocultar el UI del contador y reanudar el juego
         gameContadorUI.SetActive(false);
-        Time.timeScale = 1f; // Reanudar el tiempo del juego
-        player.enabled = true; // Volver a habilitar el PlayerController
-
-        isSpecialActive = false; // Finalizar el evento especial
+        Time.timeScale = 1f;
+        player.enabled = true;
+        isSpecialActive = false;
     }
 
-    void CorrectAnswerSelected()
+    void CorrectAnswerSelected(int questionIndex)
     {
-        AddCoins(rewardCoins); // Añadir monedas por respuesta correcta
+        AddCoins(rewardCoins);
         Debug.Log("¡Respuesta correcta! +25 monedas.");
-        gamePreguntaUI.SetActive(false); // Ocultar la pregunta
-        gameContadorUI.SetActive(true); // Activar el contador de 3 segundos
-        StartCoroutine(CountdownThreeSeconds()); // Iniciar la cuenta de 3 segundos
+        preguntasData[questionIndex].preguntaUI.SetActive(false);
+        gameContadorUI.SetActive(true);
+        StartCoroutine(CountdownThreeSeconds());
+        DeactivateSpecialObject(questionIndex);
     }
 
-    void IncorrectAnswerSelected()
+    void IncorrectAnswerSelected(int questionIndex)
     {
-        Debug.Log("Respuesta incorrecta. Has perdido.");
-        gamePreguntaUI.SetActive(false); // Ocultar el UI de preguntas
-        gameContadorUI.SetActive(false); // Ocultar el contador si está activo
-        gameOverUI.SetActive(true); // Mostrar el UI de Fin de Juego
+        AddCoins(-penaltyCoins);
+        Debug.Log("Respuesta incorrecta, -10 monedas.");
+        preguntasData[questionIndex].preguntaUI.SetActive(false);
+        gameContadorUI.SetActive(true);
+        StartCoroutine(CountdownThreeSeconds());
+        DeactivateSpecialObject(questionIndex);
     }
 
-    // Método para sumar o restar monedas
+    void DeactivateSpecialObject(int questionIndex)
+    {
+        GameObject specialObject = specialObjects[questionIndex];
+        if (specialObject != null)
+        {
+            specialObject.SetActive(false);
+            MeshRenderer meshRenderer = specialObject.GetComponent<MeshRenderer>();
+            if (meshRenderer != null) meshRenderer.enabled = false;
+        }
+    }
+
     public void AddCoins(int amount)
     {
         coinsCollected += amount;
-        coinsCollected = Mathf.Max(0, coinsCollected); // Asegurar que no haya monedas negativas
-        UpdateCoinText(); // Actualizar el texto de monedas
+        coinsCollected = Mathf.Max(0, coinsCollected);
+        UpdateCoinText();
     }
 
-    // Actualizar el texto de monedas en el UI
     void UpdateCoinText()
     {
         if (coinsText != null)
@@ -170,4 +186,15 @@ public class SpecialEventController : MonoBehaviour
             coinsText.text = "Monedas: " + coinsCollected.ToString();
         }
     }
+}
+
+// Clase para almacenar los datos de cada pregunta
+[System.Serializable]
+public class GamePreguntaData
+{
+    public GameObject preguntaUI; // Canvas de la pregunta
+    public TextMeshProUGUI tenSecText; // Texto del temporizador de 10 segundos
+    public Button correctButton; // Botón de respuesta correcta
+    public Button incorrectButton1; // Botón de respuesta incorrecta 1
+    public Button incorrectButton2; // Botón de respuesta incorrecta 2
 }
