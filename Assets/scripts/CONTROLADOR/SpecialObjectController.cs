@@ -7,8 +7,12 @@ using UnityEngine.UI;
 public class SpecialEventController : MonoBehaviour
 {
     public List<GamePreguntaData> preguntasData; // Lista de datos para cada pregunta
-    public GameObject gameContadorUI; // Canvas del contador de 3 segundos
-    public TextMeshProUGUI contadorText; // Texto del contador de 3 segundos
+    public GameObject gameContadorUI; // Canvas del contador de 3 segundos general
+    public GameObject gameContadorUICorrecto; // Canvas del contador de 3 segundos para respuesta correcta
+    public GameObject gameContadorUIIncorrecto; // Canvas del contador de 3 segundos para respuesta incorrecta
+    public TextMeshProUGUI contadorTextGeneral; // Texto del contador de 3 segundos general
+    public TextMeshProUGUI contadorTextCorrecto; // Texto del contador de 3 segundos para respuesta correcta
+    public TextMeshProUGUI contadorTextIncorrecto; // Texto del contador de 3 segundos para respuesta incorrecta
     public PlayerController player; // Referencia al PlayerController
     public List<GameObject> specialObjects; // Lista de objetos especiales
     public TextMeshProUGUI coinsText; // Texto de monedas
@@ -19,12 +23,15 @@ public class SpecialEventController : MonoBehaviour
     private bool isSpecialActive = false; // Indica si el evento especial está activo
     private int coinsCollected = 0; // Monedas obtenidas
     private int currentQuestionIndex = -1; // Índice de la pregunta actual
+    private HashSet<GameObject> usedSpecialObjects = new HashSet<GameObject>(); // Lista de objetos especiales ya utilizados
 
     private void Start()
     {
-        // Desactivar todas las UIs de pregunta y el contador de 3 segundos al iniciar
+        // Desactivar todas las UIs de pregunta y los contadores al iniciar
         foreach (var pregunta in preguntasData) pregunta.preguntaUI.SetActive(false);
         gameContadorUI.SetActive(false);
+        gameContadorUICorrecto.SetActive(false);
+        gameContadorUIIncorrecto.SetActive(false);
 
         // Asignar eventos de clic a los botones de respuesta
         for (int i = 0; i < preguntasData.Count; i++)
@@ -48,12 +55,12 @@ public class SpecialEventController : MonoBehaviour
 
     private void Update()
     {
-        // Bloquear teclas Escape, Espacio mientras la pregunta o el contador están activos
-        if (preguntasData.Exists(p => p.preguntaUI.activeSelf) || gameContadorUI.activeSelf)
+        // Bloquear teclas Escape y función de pausa mientras UI de Pregunta o Contador están activas
+        if (preguntasData.Exists(p => p.preguntaUI.activeSelf) || gameContadorUI.activeSelf || gameContadorUICorrecto.activeSelf || gameContadorUIIncorrecto.activeSelf)
         {
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Escape))
             {
-                Debug.Log("Espacio y Escape están desactivados durante el evento especial.");
+                Debug.Log("Pausa y Escape están desactivados durante el evento especial.");
             }
             return;
         }
@@ -61,7 +68,7 @@ public class SpecialEventController : MonoBehaviour
         // Verificar si colisiona con algún objeto especial
         foreach (GameObject specialObject in specialObjects)
         {
-            if (specialObject != null && IsCollidingWithPlayer(specialObject))
+            if (specialObject != null && !usedSpecialObjects.Contains(specialObject) && IsCollidingWithPlayer(specialObject))
             {
                 if (!isSpecialActive)
                 {
@@ -91,6 +98,9 @@ public class SpecialEventController : MonoBehaviour
             specialCollider.enabled = false;
         }
 
+        // Agregar el objeto especial a la lista de usados
+        usedSpecialObjects.Add(specialObject);
+
         // Esperar 0.5 segundos y activar la UI de pregunta
         yield return new WaitForSeconds(0.1f);
         StartCoroutine(StartSpecialEvent(questionIndex));
@@ -107,14 +117,14 @@ public class SpecialEventController : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(10f);
 
-        // Si no se ha respondido en 10 segundos, aplicar penalización
+        // Si no se ha respondido en 10 segundos, aplicar penalización y activar el contador general
         if (preguntasData[questionIndex].preguntaUI.activeSelf)
         {
             AddCoins(-penaltyCoins);
             Debug.Log("No respondiste a tiempo, -10 monedas.");
             preguntasData[questionIndex].preguntaUI.SetActive(false);
-            gameContadorUI.SetActive(true);
-            StartCoroutine(CountdownThreeSeconds());
+            gameContadorUI.SetActive(true); // Activar contador general
+            StartCoroutine(CountdownThreeSeconds(contadorTextGeneral, gameContadorUI));
         }
     }
 
@@ -127,7 +137,7 @@ public class SpecialEventController : MonoBehaviour
         }
     }
 
-    IEnumerator CountdownThreeSeconds()
+    IEnumerator CountdownThreeSeconds(TextMeshProUGUI contadorText, GameObject contadorUI)
     {
         for (int i = 3; i > 0; i--)
         {
@@ -135,10 +145,14 @@ public class SpecialEventController : MonoBehaviour
             yield return new WaitForSecondsRealtime(1f);
         }
 
-        gameContadorUI.SetActive(false);
+        // Finalizar el evento especial
+        contadorUI.SetActive(false);
         Time.timeScale = 1f;
         player.enabled = true;
         isSpecialActive = false;
+
+        // Asegurarse de que el objeto especial está completamente desactivado
+        DeactivateSpecialObject(currentQuestionIndex);
     }
 
     void CorrectAnswerSelected(int questionIndex)
@@ -146,9 +160,8 @@ public class SpecialEventController : MonoBehaviour
         AddCoins(rewardCoins);
         Debug.Log("¡Respuesta correcta! +25 monedas.");
         preguntasData[questionIndex].preguntaUI.SetActive(false);
-        gameContadorUI.SetActive(true);
-        StartCoroutine(CountdownThreeSeconds());
-        DeactivateSpecialObject(questionIndex);
+        gameContadorUICorrecto.SetActive(true); // Activar contador correcto
+        StartCoroutine(CountdownThreeSeconds(contadorTextCorrecto, gameContadorUICorrecto));
     }
 
     void IncorrectAnswerSelected(int questionIndex)
@@ -156,9 +169,8 @@ public class SpecialEventController : MonoBehaviour
         AddCoins(-penaltyCoins);
         Debug.Log("Respuesta incorrecta, -10 monedas.");
         preguntasData[questionIndex].preguntaUI.SetActive(false);
-        gameContadorUI.SetActive(true);
-        StartCoroutine(CountdownThreeSeconds());
-        DeactivateSpecialObject(questionIndex);
+        gameContadorUIIncorrecto.SetActive(true); // Activar contador incorrecto
+        StartCoroutine(CountdownThreeSeconds(contadorTextIncorrecto, gameContadorUIIncorrecto));
     }
 
     void DeactivateSpecialObject(int questionIndex)
@@ -167,6 +179,9 @@ public class SpecialEventController : MonoBehaviour
         if (specialObject != null)
         {
             specialObject.SetActive(false);
+            Collider specialCollider = specialObject.GetComponent<Collider>();
+            if (specialCollider != null) specialCollider.enabled = false;
+
             MeshRenderer meshRenderer = specialObject.GetComponent<MeshRenderer>();
             if (meshRenderer != null) meshRenderer.enabled = false;
         }
