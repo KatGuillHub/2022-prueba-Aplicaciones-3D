@@ -1,21 +1,22 @@
 //este codigo fue creado por guillermo
-//este script controla la logica de los frenos los frenos
+//este script controla la logica del casco
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
-public class LevelUpgrader : MonoBehaviour
+public class LevelUpgrader_casco : MonoBehaviour
 {
-    public TMP_Text levelText; // Para mostrar el nivel actual (Nivel 1, Nivel 2, etc.)
-    public Image mejoraImage; // La imagen que muestra la mejora actual
-    public Sprite[] mejoraSprites; // Las imágenes de las mejoras en array
+    public TMP_Text levelTextcasco; // Para mostrar el nivel actual (Nivel 1, Nivel 2, etc.)
+    public Image mejoraImagecasco; // La imagen que muestra la mejora actual
+    public Sprite[] mejoraSpritescasco; // Las imágenes de las mejoras en array
 
-    private int currentlevel = 0;
+    private int currentlevelcasco = 0;
     private mostrar_monedas mostrar_monedas; // Referencia al mostrar_monedas
 
     //definir monedas necesarias para nivel
-    public int[] upgradecosts = { 5, 10, 15, 20, 25 };
+    public int[] upgradecostscasco = { 5, 10, 15, 20, 25 };
     public TMP_Text noCoinsMessage; //referencia al texto "no monedas"
     public GameObject backgroundInsufficientFunds; //referencia al fondo de no monedas
 
@@ -24,9 +25,9 @@ public class LevelUpgrader : MonoBehaviour
         mostrar_monedas = FindObjectOfType<mostrar_monedas>(); // Busca el mostrar_monedas en la escena
 
         //cargar el nivel guardado (si existe)
-        if (PlayerPrefs.HasKey("FrenoLevel"))
+        if (PlayerPrefs.HasKey("CascoLevel"))
         {
-            currentlevel = PlayerPrefs.GetInt("FrenoLevel");
+            currentlevelcasco = PlayerPrefs.GetInt("CascoLevel");
         }
         UpdateUI();
 
@@ -40,13 +41,13 @@ public class LevelUpgrader : MonoBehaviour
     public void UpgradeLevel()
     {
         // Verificar si el nivel actual es menor que el máximo y si hay suficientes monedas
-        if (currentlevel < mejoraSprites.Length - 1)
+        if (currentlevelcasco < mejoraSpritescasco.Length - 1)
         {
             //verifica si tiene suficientes monedas para la mejora
-            if (mostrar_monedas.GetTotalCoins() >= upgradecosts[currentlevel])
+            if (mostrar_monedas.GetTotalCoins() >= upgradecostscasco[currentlevelcasco])
             {
                 //resta la monedas y sube de nivel
-                int newtotalcoins = mostrar_monedas.GetTotalCoins() - upgradecosts[currentlevel];
+                int newtotalcoins = mostrar_monedas.GetTotalCoins() - upgradecostscasco[currentlevelcasco];
                 PlayerPrefs.SetInt("TotalCoins", newtotalcoins);
                 PlayerPrefs.Save();
 
@@ -54,11 +55,11 @@ public class LevelUpgrader : MonoBehaviour
                 mostrar_monedas.UpdateCoinsUI(newtotalcoins);
 
                 // Incrementa el nivel y actualiza la interfaz
-                currentlevel++; //aumenta el nivel
+                currentlevelcasco++; //aumenta el nivel
                 UpdateUI();
 
                 // Guarda el nivel de frenos en PlayerPrefs
-                PlayerPrefs.SetInt("FrenoLevel", currentlevel);
+                PlayerPrefs.SetInt("CascoLevel", currentlevelcasco);
                 PlayerPrefs.Save();
 
             }
@@ -77,15 +78,15 @@ public class LevelUpgrader : MonoBehaviour
 
     private void UpdateUI()
     {
-        levelText.text = "Nivel " + (currentlevel + 1).ToString(); // Actualiza el texto del nivel
-        mejoraImage.sprite = mejoraSprites[currentlevel]; // Cambia la imagen de la mejora
-        if (currentlevel < mejoraSprites.Length && mejoraSprites[currentlevel] != null)
+        levelTextcasco.text = "Nivel " + (currentlevelcasco + 1).ToString(); // Actualiza el texto del nivel
+        mejoraImagecasco.sprite = mejoraSpritescasco[currentlevelcasco]; // Cambia la imagen de la mejora
+        if (currentlevelcasco < mejoraSpritescasco.Length && mejoraSpritescasco[currentlevelcasco] != null)
         {
-            mejoraImage.sprite = mejoraSprites[currentlevel];
+            mejoraImagecasco.sprite = mejoraSpritescasco[currentlevelcasco];
         }
         else
         {
-            Debug.LogError("Sprite no disponible o fuera de rango en el nivel " + currentlevel);
+            Debug.LogError("Sprite no disponible o fuera de rango en el nivel " + currentlevelcasco);
         }
     }
 

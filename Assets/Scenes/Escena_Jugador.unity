@@ -154,8 +154,8 @@ RectTransform:
   m_LocalScale: {x: 0.40036035, y: 0.9346963, z: 1.2540156}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1328824347}
   - {fileID: 2030664656}
+  - {fileID: 1328824347}
   - {fileID: 1875669710}
   - {fileID: 1517019489}
   m_Father: {fileID: 2140496271}
@@ -237,7 +237,7 @@ GameObject:
   - component: {fileID: 119414156}
   - component: {fileID: 119414159}
   - component: {fileID: 119414158}
-  - component: {fileID: 119414157}
+  - component: {fileID: 119414160}
   m_Layer: 5
   m_Name: Panel2
   m_TagString: Untagged
@@ -257,8 +257,8 @@ RectTransform:
   m_LocalScale: {x: 0.4067406, y: 0.9346963, z: 1.254016}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1965195047}
   - {fileID: 1915052299}
+  - {fileID: 1965195047}
   - {fileID: 618108186}
   - {fileID: 565146779}
   m_Father: {fileID: 2140496271}
@@ -268,29 +268,6 @@ RectTransform:
   m_AnchoredPosition: {x: 176, y: -75}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &119414157
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 119414155}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dbb0ae988d30e642938cee5942c0d81, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelText: {fileID: 1915052297}
-  mejoraImage: {fileID: 1965195045}
-  mejoraSprites:
-  - {fileID: 21300000, guid: 7b8b82aea5a517640971d6dd0f99b0f3, type: 3}
-  - {fileID: 21300000, guid: ba4c6b7f1ba299747b3c5cf794b09b0a, type: 3}
-  - {fileID: 21300000, guid: 644ab5fbe777ef347b21f2c3210e44de, type: 3}
-  - {fileID: 21300000, guid: 65ea21cb38111bf41a96b88c6b1f2ba3, type: 3}
-  - {fileID: 21300000, guid: 34ec5e731304fa2419f9f8faa5e9f9b0, type: 3}
-  upgradecosts: 050000000a0000000f0000001400000019000000
-  noCoinsMessage: {fileID: 1411697085}
-  backgroundInsufficientFunds: {fileID: 1817685141}
 --- !u!114 &119414158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -329,6 +306,29 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 119414155}
   m_CullTransparentMesh: 1
+--- !u!114 &119414160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 119414155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2878641b2f131243bf350e521110c05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelTextcasco: {fileID: 1915052297}
+  mejoraImagecasco: {fileID: 1965195045}
+  mejoraSpritescasco:
+  - {fileID: 21300000, guid: 7b8b82aea5a517640971d6dd0f99b0f3, type: 3}
+  - {fileID: 21300000, guid: ba4c6b7f1ba299747b3c5cf794b09b0a, type: 3}
+  - {fileID: 21300000, guid: 644ab5fbe777ef347b21f2c3210e44de, type: 3}
+  - {fileID: 21300000, guid: 65ea21cb38111bf41a96b88c6b1f2ba3, type: 3}
+  - {fileID: 21300000, guid: 34ec5e731304fa2419f9f8faa5e9f9b0, type: 3}
+  upgradecostscasco: 050000000a0000000f0000001400000019000000
+  noCoinsMessage: {fileID: 1411697085}
+  backgroundInsufficientFunds: {fileID: 1817685141}
 --- !u!1 &306881261
 GameObject:
   m_ObjectHideFlags: 0
@@ -941,7 +941,7 @@ GameObject:
   - component: {fileID: 618108188}
   - component: {fileID: 618108187}
   m_Layer: 5
-  m_Name: mejorar2
+  m_Name: mejora casco
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1011,8 +1011,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 119414157}
-        m_TargetAssemblyTypeName: LevelUpgrader, Assembly-CSharp
+      - m_Target: {fileID: 119414160}
+        m_TargetAssemblyTypeName: LevelUpgrader_casco, Assembly-CSharp
         m_MethodName: UpgradeLevel
         m_Mode: 1
         m_Arguments:
@@ -2002,7 +2002,7 @@ GameObject:
   - component: {fileID: 1328824346}
   - component: {fileID: 1328824345}
   m_Layer: 5
-  m_Name: Imagen
+  m_Name: Imagen freno
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3502,7 +3502,7 @@ GameObject:
   - component: {fileID: 1875669712}
   - component: {fileID: 1875669711}
   m_Layer: 5
-  m_Name: mejorar
+  m_Name: mejora freno
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3813,7 +3813,7 @@ GameObject:
   - component: {fileID: 1915052298}
   - component: {fileID: 1915052297}
   m_Layer: 5
-  m_Name: Text (TMP)2
+  m_Name: texto casco
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3947,7 +3947,7 @@ GameObject:
   - component: {fileID: 1965195046}
   - component: {fileID: 1965195045}
   m_Layer: 5
-  m_Name: Imagen2
+  m_Name: Imagen casco
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4091,7 +4091,7 @@ GameObject:
   - component: {fileID: 2030664655}
   - component: {fileID: 2030664654}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: texto freno
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

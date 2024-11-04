@@ -9,6 +9,9 @@ public class colorescasco : MonoBehaviour
 
     void Start()
     {
+        //cargar el color guardado al inicio
+        CargarColor();
+
         // Asegúrate de que cada botón llame a la función CambiarColor cuando se presione
         for (int i = 0; i < botonesColor2.Length; i++)
         {
@@ -22,5 +25,25 @@ public class colorescasco : MonoBehaviour
     {
         cascoRenderer.material.color = coloresDisponibles2[indiceColor];
         Debug.Log("Color cambiado a: " + coloresDisponibles2[indiceColor]);
+
+        //guardar el color seleccionado en playerprefs
+        PlayerPrefs.SetInt("CascoColorIndex", indiceColor);
+        PlayerPrefs.Save();
+    }
+
+    //cargar el color guardado
+    private void CargarColor()
+    {
+        if (PlayerPrefs.HasKey("CascoColorIndex"))
+        {
+            int colorIndex = PlayerPrefs.GetInt("CascoColorIndex");
+            cascoRenderer.material.color = coloresDisponibles2[colorIndex];
+            //mensaje de confirmacion
+            Debug.Log("color cargada correctamente en la escena de juego" + coloresDisponibles2[colorIndex]);
+        }
+        else
+        {
+            Debug.Log("No se encontro un color guardado para el casco");
+        }
     }
 }

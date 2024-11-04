@@ -36,7 +36,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        //prueba de guillermo
+        //prueba de guillermo para frenos
         gameObject.SetActive(true); // Reactivar el objeto
         //
 
@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    //prueba de guillermo
+    //prueba de guillermo para frenos
     void Awake()
     {
         Time.timeScale = 1f; // Asegura que la escala de tiempo esté en velocidad normal al iniciar la escena
