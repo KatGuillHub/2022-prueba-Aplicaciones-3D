@@ -1,3 +1,4 @@
+//este codigo fue creado por guillermo
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -20,6 +21,12 @@ public class LevelUpgrader : MonoBehaviour
     void Start()
     {
         mostrar_monedas = FindObjectOfType<mostrar_monedas>(); // Busca el mostrar_monedas en la escena
+
+        //cargar el nivel guardado (si existe)
+        if  (PlayerPrefs.HasKey("FrenoLevel"))
+        {
+            currentlevel = PlayerPrefs.GetInt("FrenoLevel");
+        }
         UpdateUI();
 
         //ocultar el mensaje al inicio
@@ -45,8 +52,14 @@ public class LevelUpgrader : MonoBehaviour
                 //actualiza la ui de monedas
                 mostrar_monedas.UpdateCoinsUI(newtotalcoins);
 
+                // Incrementa el nivel y actualiza la interfaz
                 currentlevel++; //aumenta el nivel
                 UpdateUI();
+
+                // Guarda el nivel de frenos en PlayerPrefs
+                PlayerPrefs.SetInt("FrenoLevel", currentlevel);
+                PlayerPrefs.Save();
+
             }
             else
             {

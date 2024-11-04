@@ -1,3 +1,4 @@
+//este codigo fue creado por zanchox
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,20 +28,31 @@ public class PlayerController : MonoBehaviour
     // Variables para el freno y la barra de energía
     public float energy = 100f; // Cantidad inicial de energía
     public float maxEnergy = 100f; // Energía máxima
-    public float energyConsumptionRate = 20f; // Energía consumida por segundo al frenar
-    public float energyRechargeRate = 10f; // Energía recargada por segundo
+    public float energyConsumptionRate = 40f; // Energía consumida por segundo al frenar
+    public float energyRechargeRate = 5f; // Energía recargada por segundo
     public Image energyBar; // Referencia a la barra de energía en la UI
 
     private bool canUseSpace = true; // Controla si se puede usar la tecla "espacio"
 
     void Start()
     {
+        //prueba de guillermo
+        gameObject.SetActive(true); // Reactivar el objeto
+        //
+
         // Posición inicial en el carril central
         targetPosition = transform.position;
 
         // Llamado de la animación
         animator = GetComponent<Animator>();
     }
+
+    //prueba de guillermo
+    void Awake()
+    {
+        Time.timeScale = 1f; // Asegura que la escala de tiempo esté en velocidad normal al iniciar la escena
+    }
+    //
 
     void Update()
     {
