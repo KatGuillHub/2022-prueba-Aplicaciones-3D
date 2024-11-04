@@ -5,6 +5,7 @@ using UnityEngine.UI; // Para manejar la barra de energía
 
 public class PlayerController : MonoBehaviour
 {
+    Animator animator;
     public float laneDistance = 4f; // Distancia entre cada carril
     public float laneSwitchSpeed = 50f; // Velocidad del cambio de carril
     private int currentLane = 1; // Carril actual (0: izquierda, 1: medio, 2: derecha)
@@ -36,10 +37,14 @@ public class PlayerController : MonoBehaviour
     {
         // Posición inicial en el carril central
         targetPosition = transform.position;
+
+        // Llamado de la animación
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
+
         // Movimiento entre carriles con las teclas A y D
         if (Input.GetKeyDown(KeyCode.A) && currentLane > 0)
         {
