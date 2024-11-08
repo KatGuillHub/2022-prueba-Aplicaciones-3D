@@ -1,8 +1,7 @@
-//este codigo fue creado por zanchox
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // Para manejar la barra de energía
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -34,30 +33,26 @@ public class PlayerController : MonoBehaviour
 
     private bool canUseSpace = true; // Controla si se puede usar la tecla "espacio"
 
+    // Referencias para los prefabs de parpadeo
+    public GameObject hombreBiciMov;
+    public GameObject hombreBiciMov2;
+
     void Start()
     {
-        //prueba de guillermo para frenos
-        gameObject.SetActive(true); // Reactivar el objeto
-        //
-
-        // Posición inicial en el carril central
+        // Configuración inicial
         targetPosition = transform.position;
-
-        // Llamado de la animación
         animator = GetComponent<Animator>();
     }
 
-    //prueba de guillermo para frenos
-    void Awake()
-    {
-        Time.timeScale = 1f; // Asegura que la escala de tiempo esté en velocidad normal al iniciar la escena
-    }
-    //
-
     void Update()
     {
+        HandleMovement();
+        HandleBraking();
+        UpdateEnergyBar();
+    }
 
-        // Movimiento entre carriles con las teclas A y D
+    void HandleMovement()
+    {
         if (Input.GetKeyDown(KeyCode.A) && currentLane > 0)
         {
             previousLane = currentLane;
@@ -71,58 +66,51 @@ public class PlayerController : MonoBehaviour
             SetTargetPosition();
         }
 
-        // Mover al ciclista de manera rápida a la nueva posición
         transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * laneSwitchSpeed);
+    }
 
-        // Solo permitir el uso del freno si no está bloqueado
+    void SetTargetPosition()
+    {
+        targetPosition = new Vector3((currentLane - 1) * laneDistance, transform.position.y, transform.position.z);
+    }
+
+    void HandleBraking()
+    {
         if (canUseSpace && Input.GetKey(KeyCode.Space) && energy > 0)
         {
             ApplyBrake();
         }
-        else
+        else if (isSlowingDown)
         {
-            if (isSlowingDown)
-            {
-                Time.timeScale = 1f; // Restablecer velocidad normal
-                isSlowingDown = false;
-            }
+            Time.timeScale = 1f;
+            isSlowingDown = false;
         }
 
         if (!Input.GetKey(KeyCode.Space))
         {
             RechargeEnergy();
         }
-
-        UpdateEnergyBar();
-    }
-
-    void SetTargetPosition()
-    {
-        // Cambiar la posición objetivo para el siguiente carril
-        targetPosition = new Vector3((currentLane - 1) * laneDistance, transform.position.y, transform.position.z);
     }
 
     void ApplyBrake()
     {
         if (!isSlowingDown)
         {
-            Time.timeScale = 0.5f; // Ralentizar el tiempo
+            Time.timeScale = 0.5f;
             isSlowingDown = true;
         }
 
-        // Consumir energía mientras se usa el freno
         energy -= energyConsumptionRate * Time.deltaTime;
         if (energy < 0)
         {
-            energy = 0; // Asegurarse de que la energía no sea negativa
-            Time.timeScale = 1f; // Restablecer velocidad si la energía se agota
+            energy = 0;
+            Time.timeScale = 1f;
             isSlowingDown = false;
         }
     }
 
     void RechargeEnergy()
     {
-        // Recargar la energía hasta el máximo
         energy += energyRechargeRate * Time.deltaTime;
         if (energy > maxEnergy)
         {
@@ -132,55 +120,63 @@ public class PlayerController : MonoBehaviour
 
     void UpdateEnergyBar()
     {
-        // Actualizar la barra de energía en la UI
         if (energyBar != null)
         {
             energyBar.fillAmount = energy / maxEnergy;
         }
     }
 
-    // Método para desactivar la interacción con la tecla "espacio"
     public void DisableSpaceInteraction()
     {
         canUseSpace = false;
     }
 
-    // Método para activar la interacción con la tecla "espacio"
     public void EnableSpaceInteraction()
     {
         canUseSpace = true;
     }
 
-    // Método para comenzar a temblar
     public void StartShaking(float shakeDuration)
     {
         if (shakeCoroutine != null)
         {
-            StopCoroutine(shakeCoroutine); // Si ya está temblando, detener el temblor actual
+            StopCoroutine(shakeCoroutine);
         }
-        shakeCoroutine = StartCoroutine(Shake(shakeDuration)); // Iniciar el temblor
+        shakeCoroutine = StartCoroutine(Shake(shakeDuration));
     }
 
     private IEnumerator Shake(float shakeDuration)
     {
         isShaking = true;
-        canBeHitAgain = false; // Durante el tiempo de temblor, el jugador puede perder si vuelve a chocar
-        Debug.Log("El jugador está temblando");
-        yield return new WaitForSeconds(shakeDuration);
+        canBeHitAgain = false;
+
+        float shakeEndTime = Time.time + shakeDuration;
+        while (Time.time < shakeEndTime)
+        {
+            // Activar y desactivar los objetos para parpadeo
+            bool isActive = hombreBiciMov.activeSelf;
+            hombreBiciMov.SetActive(!isActive);
+            hombreBiciMov2.SetActive(!isActive);
+
+            yield return new WaitForSeconds(0.07f); // Controla la velocidad de parpadeo
+        }
+
+        // Asegurarse de que ambos objetos estén activados al final
+        hombreBiciMov.SetActive(true);
+        hombreBiciMov2.SetActive(true);
+
         isShaking = false;
-        canBeHitAgain = true; // Ahora puede volver a chocar sin perder automáticamente
-        Debug.Log("El jugador deja de temblar");
+        canBeHitAgain = true;
     }
 
     public void ResetToLane()
     {
-        currentLane = previousLane; // Vuelve al carril anterior
-        SetTargetPosition(); // Ajustar la posición del jugador
+        currentLane = previousLane;
+        SetTargetPosition();
     }
 
     public void LoseGame()
     {
-        // Llamar al GameController y pasar el número de monedas recogidas en esta partida
         FindObjectOfType<GameController>().OnPlayerDeath(coinsCollectedThisGame);
     }
 
@@ -206,8 +202,7 @@ public class PlayerController : MonoBehaviour
 
         if (isFrontalCollision)
         {
-            Debug.Log("Colisión frontal detectada");
-            LoseGame(); // Pierde si se choca de frente en cualquier carril
+            LoseGame();
         }
         else
         {
@@ -219,18 +214,15 @@ public class PlayerController : MonoBehaviour
     {
         if (isShaking && !canBeHitAgain)
         {
-            Debug.Log("Colisión lateral durante el temblor, el jugador pierde.");
             LoseGame();
         }
         else
         {
-            Debug.Log("Colisión lateral detectada, el jugador comienza a temblar.");
             StartShaking(shakeTime);
             ResetToLane();
         }
     }
 
-    // Método que maneja la recolección de monedas
     void CollectCoin(GameObject coin)
     {
         coin.SetActive(false);
@@ -238,13 +230,9 @@ public class PlayerController : MonoBehaviour
         objectsController.AddCoin();
         StartCoroutine(objectsController.RespawnCoin(coin));
 
-        // Incrementar el contador de monedas recogidas en la partida actual
         coinsCollectedThisGame++;
-
-        // Guardar monedas en PlayerPrefs (monedas totales)
         int currentCoins = PlayerPrefs.GetInt("TotalCoins", 0);
-        currentCoins++;
-        PlayerPrefs.SetInt("TotalCoins", currentCoins);
+        PlayerPrefs.SetInt("TotalCoins", currentCoins + 1);
         PlayerPrefs.Save();
     }
 }
