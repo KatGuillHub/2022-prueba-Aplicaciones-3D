@@ -34,15 +34,26 @@ public class PlayerController : MonoBehaviour
     private bool canUseSpace = true; // Controla si se puede usar la tecla "espacio"
 
     // Referencias para los prefabs de parpadeo
-    public GameObject hombreBiciMov;
-    public GameObject hombreBiciMov2;
+    public GameObject hombreBiciMov; //hombre
+    public GameObject hombreBiciMov2; //mujer
 
     void Start()
     {
+        //prueba de guillermo POR FAVOR NO BORRAR
+        gameObject.SetActive(true); // Reactivar el objeto
+        //
+
         // Configuración inicial
         targetPosition = transform.position;
         animator = GetComponent<Animator>();
     }
+
+    //prueba de guillermo POR FAVOR NO BORRAR
+    void Awake()
+    {
+        Time.timeScale = 1f; // Asegura que la escala de tiempo esté en velocidad normal al iniciar la escena
+    }
+    //
 
     void Update()
     {
@@ -157,6 +168,7 @@ public class PlayerController : MonoBehaviour
             bool isActive = hombreBiciMov.activeSelf;
             hombreBiciMov.SetActive(!isActive);
             hombreBiciMov2.SetActive(!isActive);
+            Debug.Log("el jugador esta temblando");
 
             yield return new WaitForSeconds(0.07f); // Controla la velocidad de parpadeo
         }
@@ -167,6 +179,7 @@ public class PlayerController : MonoBehaviour
 
         isShaking = false;
         canBeHitAgain = true;
+        Debug.Log("El jugador deja de temblar");
     }
 
     public void ResetToLane()
@@ -214,10 +227,12 @@ public class PlayerController : MonoBehaviour
     {
         if (isShaking && !canBeHitAgain)
         {
+            Debug.Log("Colisión lateral durante el temblor, el jugador pierde.");
             LoseGame();
         }
         else
         {
+            Debug.Log("Colisión lateral detectada, el jugador comienza a temblar.");
             StartShaking(shakeTime);
             ResetToLane();
         }

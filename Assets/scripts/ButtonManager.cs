@@ -3,16 +3,24 @@ using UnityEngine.SceneManagement; // Necesario para cargar nuevas escenas
 
 public class ButtonManager : MonoBehaviour
 {
+    public GameObject PanelOpciones;
+
     public void OnJugarButtonClicked() //nombres para el script "jugar" todo lo demas es igual
     {
         Debug.Log("Boton Jugar presionado");
         SceneManager.LoadScene("Escena_Juego");
     }
 
-    public void OnOpcionesButtonClicked()
+    public void OnSalirButtonClicked()
     {
-        Debug.Log("Bton Opciones presionado");
-        SceneManager.LoadScene("Escena_Opciones");
+        Debug.Log("Boton Salir Presionado");
+        Application.Quit();
+    }
+
+    public void OnMejorasButtonClicked()
+    {
+        Debug.Log("Boton Mejoras Presionado");
+        SceneManager.LoadScene("Escena_Mejoras");
     }
 
     public void OnGarajeButtonClicked()
@@ -21,10 +29,10 @@ public class ButtonManager : MonoBehaviour
         SceneManager.LoadScene("Escena_Garaje");
     }
 
-    public void OnJugadorButtonClicked()
+    public void AlternarOpciones()
     {
-        Debug.Log("Boton Jugador Presionado");
-        SceneManager.LoadScene("Escena_Jugador");
+        // Cambia el estado activo del panel: si está activo, lo oculta; si está inactivo, lo muestra
+        PanelOpciones.SetActive(!PanelOpciones.activeSelf);
     }
 
     public void OnAtrasButtonClicked()
@@ -48,9 +56,4 @@ public class ButtonManager : MonoBehaviour
         Debug.Log("Boton Idioma Presionado");
     }
 
-    public void OnQuitButtonClicked()
-    {
-        Debug.Log("Boton Quit Presionado");
-        Application.Quit();
-    }
 }
