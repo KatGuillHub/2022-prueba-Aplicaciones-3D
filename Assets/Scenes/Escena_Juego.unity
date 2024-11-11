@@ -44630,6 +44630,7 @@ MonoBehaviour:
   energyBar: {fileID: 402324384}
   hombreBiciMov: {fileID: 2048387824}
   hombreBiciMov2: {fileID: 1953574608}
+  cascoShakeManager: {fileID: 2042016550}
 --- !u!54 &1145455762
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -78299,6 +78300,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2042016549}
   - component: {fileID: 2042016548}
+  - component: {fileID: 2042016550}
   m_Layer: 0
   m_Name: vacio no borrar
   m_TagString: Untagged
@@ -78334,6 +78336,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2042016550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2042016546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f85e6e82dfd06146a7500a49bde6c79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxTambaleos: 0
 --- !u!4 &2042247268 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6623293120244526923, guid: 836a5c5554f27244cbca2b2720097e6b, type: 3}

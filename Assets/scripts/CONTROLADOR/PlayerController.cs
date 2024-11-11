@@ -21,6 +21,12 @@ public class PlayerController : MonoBehaviour
     public float collisionThresholdZ = 1.5f; // Umbral de distancia para detectar colisión frontal en el eje Z
     public float collisionThresholdX = 0.5f; // Umbral de distancia para detectar colisión frontal en el eje X
 
+    //PRUEBA DE CASCO GUILLERMO
+    private float invulnerabilityTime = 1f; // Tiempo de invulnerabilidad después del tambaleo
+    private float invulnerabilityTimer = 0f;
+    private GameObject modeloSeleccionado;
+    //
+
     // Variables de monedas
     private int coinsCollectedThisGame = 0; // Monedas recogidas en esta partida
 
@@ -37,8 +43,31 @@ public class PlayerController : MonoBehaviour
     public GameObject hombreBiciMov; //hombre
     public GameObject hombreBiciMov2; //mujer
 
+    //INTENTO DE IMPLEMENTACION DE TAMBALEO CON EL CASCO
+    public CascoShakeManager cascoShakeManager; // Asignar el CascoShakeManager en el inspector
+    //
+
     void Start()
     {
+        //PRUEBA CASCO GUILLERMO
+        // Suponiendo que el jugador selecciona 1 o 2, asigna el modelo correspondiente
+        if (PlayerPrefs.GetInt("PersonajeSeleccionado") == 1)
+        {
+            modeloSeleccionado = hombreBiciMov;
+            hombreBiciMov2.SetActive(false);
+        }
+        else
+        {
+            modeloSeleccionado = hombreBiciMov2;
+            hombreBiciMov.SetActive(false);
+        }
+        modeloSeleccionado.SetActive(true); // Asegura que solo el modelo seleccionado esté activo
+        //
+
+        //PRUEBA CASCO GUILLERMO
+        cascoShakeManager = FindObjectOfType<CascoShakeManager>();
+        //
+
         //prueba de guillermo POR FAVOR NO BORRAR
         gameObject.SetActive(true); // Reactivar el objeto
         //
@@ -60,6 +89,13 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         HandleBraking();
         UpdateEnergyBar();
+
+        //PRUEBA CASCO GUILLERMO
+        if (invulnerabilityTimer > 0)
+        {
+            invulnerabilityTimer -= Time.deltaTime;
+        }
+        //
     }
 
     void HandleMovement()
@@ -158,9 +194,10 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator Shake(float shakeDuration)
     {
-        isShaking = true;
-        canBeHitAgain = false;
+        isShaking = true; //era true
+        canBeHitAgain = false; //era false
 
+        /*//CODIGO ORIGINAL
         float shakeEndTime = Time.time + shakeDuration;
         while (Time.time < shakeEndTime)
         {
@@ -176,6 +213,24 @@ public class PlayerController : MonoBehaviour
         // Asegurarse de que ambos objetos estén activados al final
         hombreBiciMov.SetActive(true);
         hombreBiciMov2.SetActive(true);
+        //*/
+
+        //CODIGO PRUEBA GUILLERMO
+        float shakeEndTime = Time.time + shakeDuration;
+        while (Time.time < shakeEndTime)
+        {
+            // Alternar la visibilidad del modelo seleccionado para el parpadeo
+            bool isActive = modeloSeleccionado.activeSelf;
+            modeloSeleccionado.SetActive(!isActive);
+
+            Debug.Log("El jugador está temblando");
+
+            yield return new WaitForSeconds(0.07f);
+        }
+
+        // Asegurarse de que el modelo seleccionado esté activado al final
+        modeloSeleccionado.SetActive(true);
+        //
 
         isShaking = false;
         canBeHitAgain = true;
@@ -223,9 +278,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //INTENTO DE IMPLEMENTACION DE MAS TAMBALEOS
     void HandleLateralCollision()
     {
-        if (isShaking && !canBeHitAgain)
+        //TODO ESTO ES EL CODIGO ORIGINAL
+        /*if (isShaking && !canBeHitAgain)
         {
             Debug.Log("Colisión lateral durante el temblor, el jugador pierde.");
             LoseGame();
@@ -235,6 +292,31 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Colisión lateral detectada, el jugador comienza a temblar.");
             StartShaking(shakeTime);
             ResetToLane();
+        } */ 
+
+        //ESTA ES LA PARTE NUEVA
+        if (invulnerabilityTimer > 0)
+        {
+            // El jugador está en invulnerabilidad, no se procesan más colisiones.
+            return;
+        }
+
+        if (isShaking && !canBeHitAgain)
+        {
+            Debug.Log("Colisión lateral durante el temblor, el jugador pierde.");
+            LoseGame();
+        }
+        else if (cascoShakeManager.PuedeTambalear()) //Verifica con el CascoShakeManager
+        {
+            Debug.Log("Colisión lateral detectada, el jugador comienza a temblar.");
+            StartShaking(shakeTime);
+            ResetToLane();
+            invulnerabilityTimer = invulnerabilityTime; // Activa la invulnerabilidad
+        }
+        else
+        {
+            Debug.Log("El jugador ha agotado los tambaleos, pierde.");
+            LoseGame();
         }
     }
 
