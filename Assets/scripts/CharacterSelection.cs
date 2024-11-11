@@ -17,14 +17,6 @@ public class CharacterSelection : MonoBehaviour
         //asignar funciones a los botones
         maleButton.onClick.AddListener(() => SeleccionarPersonaje(1));
         femaleButton.onClick.AddListener(() => SeleccionarPersonaje(2));
-
-
-        // Desactivar por defecto la imagen femenina
-        //femaleImage.gameObject.SetActive(false);
-
-        // Asignar funciones a los botones
-        //maleButton.onClick.AddListener(ShowMaleCharacter);
-        //femaleButton.onClick.AddListener(ShowFemaleCharacter);
     }
 
     //selecionar personaje y guardar la seleccion
@@ -63,18 +55,4 @@ public class CharacterSelection : MonoBehaviour
             SeleccionarPersonaje(1);
         }
     }
-
-    /*// Mostrar personaje masculino
-    void ShowMaleCharacter()
-    {
-        maleImage.gameObject.SetActive(true);
-        femaleImage.gameObject.SetActive(false);
-    }
-
-    // Mostrar personaje femenino
-    void ShowFemaleCharacter()
-    {
-        maleImage.gameObject.SetActive(false);
-        femaleImage.gameObject.SetActive(true);
-    }*/
 }
