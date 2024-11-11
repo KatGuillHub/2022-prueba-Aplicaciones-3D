@@ -20,13 +20,13 @@ public class cambio_boton_musica : MonoBehaviour
         {
             // Cambiar la imagen a la del botón apagado
             button.image.sprite = musicOffSprite;
-            // Aquí también puedes poner el código para apagar la música
+            AudioListener.volume = 0; //apagar la musica
         }
         else
         {
             // Cambiar la imagen a la del botón encendido
             button.image.sprite = musicOnSprite;
-            // Aquí puedes poner el código para encender la música
+            AudioListener.volume = 1; //encender la musica
         }
 
         // Cambia el estado de la música
