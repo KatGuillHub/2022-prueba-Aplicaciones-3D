@@ -29,7 +29,9 @@ public class EnvironmentController : MonoBehaviour
         { 7, new List<int>{ 1, 3, 5, 8, 9, 10 } },
         { 8, new List<int>{ 2, 4, 6, 9, 10 } },
         { 9, new List<int>{ 1, 3, 5, 7, 10 } },
-        { 10, new List<int>{ 1, 2, 4, 6, 8, 9 } }
+        { 10, new List<int>{ 1, 2, 4, 6, 8, 9 } },
+        { 11, new List<int>{ 1, 2, 4, 6, 8, 9 } },
+        { 12, new List<int>{ 1, 2, 4, 6, 8, 9 } }
     };
 
     void Start()
