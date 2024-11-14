@@ -47,6 +47,12 @@ public class PlayerController : MonoBehaviour
     public CascoShakeManager cascoShakeManager; // Asignar el CascoShakeManager en el inspector
     //
 
+    /*//Efectos de sonido
+    public AudioSource audioSource; //Fuente de audio para el efecto de bocina
+    public AudioClip hornClip; //Clip de sonido de bocina
+    public static bool areEffectsMuted = false;  // Variable estática para el estado de los efectos
+    //*/
+
     void Start()
     {
         //PRUEBA CASCO GUILLERMO
@@ -75,6 +81,9 @@ public class PlayerController : MonoBehaviour
         // Configuración inicial
         targetPosition = transform.position;
         animator = GetComponent<Animator>();
+
+        //mantener el objeto entre escenas
+        //DontDestroyOnLoad(gameObject); efectos sonido
     }
 
     //prueba de guillermo POR FAVOR NO BORRAR
@@ -83,6 +92,32 @@ public class PlayerController : MonoBehaviour
         Time.timeScale = 1f; // Asegura que la escala de tiempo esté en velocidad normal al iniciar la escena
     }
     //
+
+    /*// Método para manejar cuando el personaje se acerque a un obstáculo EFECTOS DE SONIDO
+    public void ToggleEffects(bool isMuted)
+    {
+        areEffectsMuted = isMuted; // Cambia el estado de los efectos de sonido
+
+        if (isMuted)
+        {
+            // Aquí puedes poner la lógica para silenciar los efectos de sonido, por ejemplo:
+            AudioListener.volume = 0;  // Esto silencia todos los sonidos en el juego
+        }
+        else
+        {
+            // Y aquí puedes restaurar el volumen
+            AudioListener.volume = 1;  // Esto restaura el volumen normal
+        }
+    }
+
+    void HandleNearObstacle()
+    {
+        if (!areEffectsMuted && hornClip != null)
+        {
+            audioSource.PlayOneShot(hornClip); // Reproducir el efecto de bocina
+        }
+    }
+    //*/ 
 
     void Update()
     {
@@ -253,6 +288,7 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("Obstacle"))
         {
             HandleObstacleCollision(other);
+            //HandleNearObstacle(); // Verificar si el jugador está cerca de un obstáculo EFECTOS DE SONIDO
         }
         else if (other.CompareTag("Coin"))
         {
