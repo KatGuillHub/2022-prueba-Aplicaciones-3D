@@ -8,8 +8,8 @@ public class recarga_energia : MonoBehaviour
     private int frenoLevel;
 
     // Tasa base de recarga y aumento por nivel
-    private float baseRechargeRate = 5f; // Tasa inicial de recarga
-    private float rechargeRatePerLevel = 5f; // Aumento de recarga por nivel de frenos
+    private float baseRechargeRate = 1f; // Tasa inicial de recarga
+    private float rechargeRatePerLevel = 1f; // Aumento de recarga por nivel de frenos
 
     void Start()
     {

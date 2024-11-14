@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour
     public float energy = 100f; // Cantidad inicial de energía
     public float maxEnergy = 100f; // Energía máxima
     public float energyConsumptionRate = 40f; // Energía consumida por segundo al frenar
-    public float energyRechargeRate = 5f; // Energía recargada por segundo
+    public float energyRechargeRate = 0f; // Energía recargada por segundo
     public Image energyBar; // Referencia a la barra de energía en la UI
 
     private bool canUseSpace = true; // Controla si se puede usar la tecla "espacio"
