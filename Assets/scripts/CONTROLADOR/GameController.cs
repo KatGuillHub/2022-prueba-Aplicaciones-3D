@@ -12,6 +12,11 @@ public class GameController : MonoBehaviour
     public PlayerController playerController; // Referencia al PlayerController
     public CanvasGroup tutorialCanvasGroup; // Referencia al CanvasGroup para el fade in/out del tutorial
 
+    public TextMeshProUGUI distanceTextGameOver; // Referencia al texto de distancia en Game Over
+    public TextMeshProUGUI coinsTextGameOver; // Referencia al texto de monedas en Game Over
+
+    private int coinsCollectedThisGame = 0; // Monedas acumuladas en la partida actual
+
     public float tutorialDuration = 3f; // Duración del tutorial en segundos
     public float fadeDuration = 1f; // Duración del fade in/out en segundos
 
@@ -48,8 +53,8 @@ public class GameController : MonoBehaviour
         gameOverUI.SetActive(true); // Mostrar la pantalla de Fin de Juego
 
         // Actualizar la UI con la distancia recorrida y monedas obtenidas
-        gameOverUI.transform.Find("DistanceText").GetComponent<TextMeshProUGUI>().text = "Distancia: " + Mathf.Floor(gameHUDView.GetDistanceTravelled()) + "m";
-        gameOverUI.transform.Find("CoinsText").GetComponent<TextMeshProUGUI>().text = "Monedas: " + coinsCollectedThisGame.ToString();
+        distanceTextGameOver.text = "Distancia: " + Mathf.Floor(gameHUDView.GetDistanceTravelled()) + "m";
+        coinsTextGameOver.text = "Monedas: " + coinsCollectedThisGame.ToString();
 
         // Desactivar el HUD del juego
         gameHUDView.gameObject.SetActive(false);
@@ -59,6 +64,13 @@ public class GameController : MonoBehaviour
 
         // Bloquear la interacción del espacio en PlayerController
         playerController.DisableSpaceInteraction();
+    }
+
+    // Método para actualizar el contador de monedas en el HUD
+    public void UpdateCoinCount(int coinsCollected)
+    {
+        coinsCollectedThisGame = coinsCollected;
+        gameHUDView.UpdateCoinsText(coinsCollectedThisGame); // Pasa el valor de monedas recolectadas como argumento
     }
 
     // Método para reiniciar la partida
@@ -72,7 +84,6 @@ public class GameController : MonoBehaviour
     public void GoToMainMenu()
     {
         Debug.Log("Se envió al menú principal.");
-        // Aquí podrías cargar la escena del menú principal usando:
         SceneManager.LoadScene("Pantalla_Principal");
     }
 

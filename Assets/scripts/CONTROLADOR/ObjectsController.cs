@@ -120,8 +120,8 @@ public class ObjectsController : MonoBehaviour
     // Método para sumar una moneda al contador
     public void AddCoin()
     {
-        coinsCollected++;
-        coinsText.text = "Monedas: " + coinsCollected.ToString();
+        // Llamar a AddCoins en SpecialEventController
+        FindObjectOfType<SpecialEventController>().AddCoins(1); // Aumenta en 1 cada vez que recoges una moneda
     }
 
     // Corrutina para reaparecer la moneda después de 3 segundos

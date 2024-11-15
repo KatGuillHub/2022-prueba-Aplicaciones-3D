@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public class GameHUDView : MonoBehaviour
 {
@@ -21,17 +19,24 @@ public class GameHUDView : MonoBehaviour
     }
 
     // Llamar a esta función cuando el jugador recoja una moneda
-    public void AddCoin()
+    /*public void AddCoin()
     {
         coinsCollected++;
         UpdateCoinsText(); // Actualizar el texto de monedas cuando se recoja una
-    }
+    }*/
 
     // Método para actualizar el texto de las monedas en el HUD
-    private void UpdateCoinsText()
+    public void UpdateCoinsText(int coins)
     {
-        coinsText.text = "Monedas: " + coinsCollected.ToString();
+        coinsText.text = "Monedas: " + coins.ToString();
     }
+
+    // Método para configurar el total de monedas desde otro script (SpecialEventController)
+    /*public void SetCoinsCollected(int newTotal)
+    {
+        coinsCollected = newTotal;
+        UpdateCoinsText();
+    }*/
 
     public float GetDistanceTravelled()
     {

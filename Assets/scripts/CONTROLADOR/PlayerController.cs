@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
     private float invulnerabilityTime = 1f; // Tiempo de invulnerabilidad después del tambaleo
     private float invulnerabilityTimer = 0f;
     private GameObject modeloSeleccionado;
+
+    private GameController gameController;
     //
 
     // Variables de monedas
@@ -82,6 +84,12 @@ public class PlayerController : MonoBehaviour
         targetPosition = transform.position;
         animator = GetComponent<Animator>();
 
+        gameController = FindObjectOfType<GameController>();
+        if (gameController == null)
+        {
+            Debug.LogError("GameController no encontrado.");
+        }
+
         //mantener el objeto entre escenas
         //DontDestroyOnLoad(gameObject); efectos sonido
     }
@@ -117,7 +125,7 @@ public class PlayerController : MonoBehaviour
             audioSource.PlayOneShot(hornClip); // Reproducir el efecto de bocina
         }
     }
-    //*/ 
+    //*/
 
     void Update()
     {
@@ -280,7 +288,7 @@ public class PlayerController : MonoBehaviour
 
     public void LoseGame()
     {
-        FindObjectOfType<GameController>().OnPlayerDeath(coinsCollectedThisGame);
+        gameController.OnPlayerDeath(coinsCollectedThisGame); // Pasar las monedas al GameController
     }
 
     private void OnTriggerStay(Collider other)
@@ -328,7 +336,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Colisión lateral detectada, el jugador comienza a temblar.");
             StartShaking(shakeTime);
             ResetToLane();
-        } */ 
+        } */
 
         //ESTA ES LA PARTE NUEVA
         if (invulnerabilityTimer > 0)
@@ -360,6 +368,9 @@ public class PlayerController : MonoBehaviour
     {
         coin.SetActive(false);
         ObjectsController objectsController = FindObjectOfType<ObjectsController>();
+        // Actualiza el contador de monedas en GameController
+        FindObjectOfType<GameController>().UpdateCoinCount(coinsCollectedThisGame);
+        gameController.UpdateCoinCount(coinsCollectedThisGame); // Pasar el nuevo conteo de monedas
         objectsController.AddCoin();
         StartCoroutine(objectsController.RespawnCoin(coin));
 

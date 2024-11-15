@@ -67536,6 +67536,8 @@ MonoBehaviour:
   gameHUDView: {fileID: 1609081070}
   playerController: {fileID: 1145455761}
   tutorialCanvasGroup: {fileID: 1733578491}
+  distanceTextGameOver: {fileID: 1129868695}
+  coinsTextGameOver: {fileID: 931819987}
   tutorialDuration: 2
   fadeDuration: 1
 --- !u!4 &1757623779 stripped
