@@ -20,18 +20,18 @@ public class EnvironmentController : MonoBehaviour
 
     private Dictionary<int, List<int>> connectionRules = new Dictionary<int, List<int>>()
     {
-        { 1, new List<int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10 } },
-        { 2, new List<int>{ 1, 3, 5, 7, 9, 10 } },
-        { 3, new List<int>{ 1, 4, 6, 8, 10 } },
-        { 4, new List<int>{ 1, 2, 5, 7, 10 } },
-        { 5, new List<int>{ 1, 3, 6, 8, 10 } },
-        { 6, new List<int>{ 2, 4, 7, 9, 10 } },
-        { 7, new List<int>{ 1, 3, 5, 8, 9, 10 } },
-        { 8, new List<int>{ 2, 4, 6, 9, 10 } },
-        { 9, new List<int>{ 1, 3, 5, 7, 10 } },
-        { 10, new List<int>{ 1, 2, 4, 6, 8, 9 } },
-        { 11, new List<int>{ 1, 2, 4, 6, 8, 9 } },
-        { 12, new List<int>{ 1, 2, 4, 6, 8, 9 } }
+        { 1, new List<int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },
+        { 2, new List<int>{ 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },
+        { 3, new List<int>{ 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },
+        { 4, new List<int>{ 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12 } },
+        { 5, new List<int>{ 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12 } },
+        { 6, new List<int>{ 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12 } },
+        { 7, new List<int>{ 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12 } },
+        { 8, new List<int>{ 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12 } },
+        { 9, new List<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12 } },
+        { 10, new List<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12 } },
+        { 11, new List<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 } },
+        { 12, new List<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 } }
     };
 
     void Start()

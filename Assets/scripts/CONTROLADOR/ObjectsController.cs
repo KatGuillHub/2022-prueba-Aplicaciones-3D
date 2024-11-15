@@ -25,18 +25,18 @@ public class ObjectsController : MonoBehaviour
     // Regla de conexión entre escenarios y obstáculos
     private Dictionary<int, List<int>> obstacleRules = new Dictionary<int, List<int>>()
     {
-        { 1, new List<int>{ 1, 2 } },            // Bloque 1 llama a Objeto 1 o 2
-        { 2, new List<int>{ 2, 3 } },            // Bloque 2 llama a Objeto 2 o 3
-        { 3, new List<int>{ 3, 4 } },            // Bloque 3 llama a Objeto 3 o 4
-        { 4, new List<int>{ 4, 5 } },            // Bloque 4 llama a Objeto 4 o 5
-        { 5, new List<int>{ 5, 6 } },            // Bloque 5 llama a Objeto 5 o 6
-        { 6, new List<int>{ 6, 7 } },            // Bloque 6 llama a Objeto 6 o 7
-        { 7, new List<int>{ 7, 8 } },            // Bloque 7 llama a Objeto 7 o 8
-        { 8, new List<int>{ 8, 9 } },            // Bloque 8 llama a Objeto 8 o 9
-        { 9, new List<int>{ 9, 10 } },           // Bloque 9 llama a Objeto 9 o 10
-        { 10, new List<int>{ 10, 1 } },          // Bloque 10 llama a Objeto 10 o 1
-        { 11, new List<int>{ 1, 2 } },           // Bloque 1 llama a Objeto 1 o 2
-        { 12, new List<int>{ 2, 3 } }            // Bloque 2 llama a Objeto 2 o 3
+        { 1, new List<int>{ 1, 4, 7, 10 } },            // Bloque 1 llama a Objeto 1, 4, 7, 10 Ciclovia
+        { 2, new List<int>{ 2, 3, 5, 6, 8, 9, 11, 12 } },            // Bloque 2 llama a Objeto 2, 3, 5, 6, 8, 9, 11, 12
+        { 3, new List<int>{ 1, 4, 7, 10 } },            // Bloque 3 llama a Objeto 1, 4, 7, 10 Ciclovia
+        { 4, new List<int>{ 2, 3, 5, 6, 8, 9, 11, 12 } },            // Bloque 4 llama a Objeto 2, 3, 5, 6, 8, 9, 11, 12
+        { 5, new List<int>{ 1, 4, 7, 10 } },            // Bloque 5 llama a Objeto 1, 4, 7, 10 Ciclovia
+        { 6, new List<int>{ 2, 3, 5, 6, 8, 9, 11, 12 } },            // Bloque 6 llama a Objeto 2, 3, 5, 6, 8, 9, 11, 12
+        { 7, new List<int>{ 1, 4, 7, 10 } },            // Bloque 7 llama a Objeto 1, 4, 7, 10 Ciclovia
+        { 8, new List<int>{ 2, 3, 5, 6, 8, 9, 11, 12 } },            // Bloque 8 llama a Objeto 2, 3, 5, 6, 8, 9, 11, 12
+        { 9, new List<int>{ 1, 4, 7, 10 } },           // Bloque 9 llama a Objeto 1, 4, 7, 10 Ciclovia
+        { 10, new List<int>{ 2, 3, 5, 6, 8, 9, 11, 12 } },          // Bloque 10 llama a Objeto 2, 3, 5, 6, 8, 9, 11, 12
+        { 11, new List<int>{ 1, 4, 7, 10 } },           // Bloque 11 llama a Objeto 1, 4, 7, 10 Ciclovia
+        { 12, new List<int>{ 2, 3, 5, 6, 8, 9, 11, 12 } }            // Bloque 12 llama a Objeto 2, 3, 5, 6, 8, 9, 11, 12
     };
 
     void Start()
